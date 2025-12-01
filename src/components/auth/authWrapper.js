@@ -17,7 +17,9 @@ export default function AuthWrapper({ children }) {
         if (isAuthenticated || accessToken) {
             router.push("/dashboard");
         }
-       
+        else if (!isAuthenticated && !accessToken) {
+            router.push("/auth/login");
+        }
         else {
                 // User is not authenticated, allow access to auth pages
                 setIsLoading(false);

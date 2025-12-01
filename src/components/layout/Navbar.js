@@ -2,15 +2,23 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { logoutUser } from "@/store/authSlice";
 
 export default function Navbar() {
   const [showDropdown, setShowDropdown] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const dispatch = useDispatch();
   const { user, isAuthenticated } = useSelector((state) => state.auth);
+
+  // Hide navbar on auth pages (login, signup, verify)
+  const isAuthPage = pathname?.startsWith('/auth/');
+
+  if (isAuthPage) {
+    return null;
+  }
 
   async function handleLogout() {
     try {
@@ -109,11 +117,11 @@ export default function Navbar() {
                       <p className="text-xs text-gray-500 truncate">{userEmail}</p>
                     </div>
                     <Link
-                      href="/dashboard"
+                      href="/profile"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       onClick={() => setShowDropdown(false)}
                     >
-                      My Dashboard
+                      My Profile
                     </Link>
                     <button
                       onClick={() => {

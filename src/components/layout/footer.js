@@ -1,9 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
     const currentYear = new Date().getFullYear();
+    const pathname = usePathname();
+
+    // Hide footer on auth pages (login, signup, verify)
+    const isAuthPage = pathname?.startsWith('/auth/');
+
+    if (isAuthPage) {
+        return null;
+    }
 
     return (
         <footer className="w-full bg-gray-900 text-gray-300">
