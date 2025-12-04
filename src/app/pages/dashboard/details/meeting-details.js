@@ -288,7 +288,7 @@ const MeetingDetailsPage = ({ meetingId }) => {
                             </>
                         )}
                     </div>
-                    <p className="text-base text-gray-600">{data.description}</p>
+                    {/* <p className="text-base text-gray-600">{data.description}</p> */}
                     <div className="flex flex-wrap gap-6 mt-3">
                         <span className="flex items-center gap-2 text-sm text-gray-700">
                             <span className="font-semibold text-gray-900">Uploaded:</span>
@@ -304,18 +304,7 @@ const MeetingDetailsPage = ({ meetingId }) => {
                                 {data.status}
                             </span>
                         </span>
-                        {Array.isArray(data.participants) && data.participants.length > 0 && (
-                            <span className="flex items-center gap-2 text-sm text-gray-700">
-                                <span className="font-semibold text-gray-900">Participants:</span>
-                                <span className="text-gray-800">
-                                    {data.participants.map((p, i) => (
-                                        <span key={i}>
-                                            {p.name}{p.email ? ` (${p.email})` : ''}{i < data.participants.length - 1 ? ', ' : ''}
-                                        </span>
-                                    ))}
-                                </span>
-                            </span>
-                        )}
+                      
                     </div>
                 </div>
             </div>

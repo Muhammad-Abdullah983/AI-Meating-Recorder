@@ -13,8 +13,10 @@ export const loginUser = createAsyncThunk(
 
             if (error) throw error;
             const accessToken = data.session?.access_token;
-            if (accessToken) {
-                localStorage.setItem("accessToken", accessToken);
+            if (accessToken && typeof window !== 'undefined') {
+                try {
+                    localStorage.setItem("accessToken", accessToken);
+                } catch (_) { }
             }
             return {
                 user: data.user,
@@ -39,8 +41,10 @@ export const signupUser = createAsyncThunk(
             if (error) throw error;
 
             const accessToken = data.session?.access_token;
-            if (accessToken) {
-                localStorage.setItem("accessToken", accessToken);
+            if (accessToken && typeof window !== 'undefined') {
+                try {
+                    localStorage.setItem("accessToken", accessToken);
+                } catch (_) { }
             }
 
             return {
@@ -59,8 +63,12 @@ export const logoutUser = createAsyncThunk(
         try {
             const { error } = await supabase.auth.signOut();
             if (error) throw error;
-            // Clear access token from localStorage
-            localStorage.removeItem("accessToken");
+            // Clear access token from localStorage (client-side only)
+            if (typeof window !== 'undefined') {
+                try {
+                    localStorage.removeItem("accessToken");
+                } catch (_) { }
+            }
             return null;
         } catch (err) {
             return rejectWithValue(err.message || "Logout failed");

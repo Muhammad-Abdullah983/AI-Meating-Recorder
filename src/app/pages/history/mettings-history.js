@@ -171,7 +171,7 @@ const MeetingHistory = () => {
                             {!selectionMode && (
                                 <button
                                     onClick={() => setSelectionMode(true)}
-                                    className="px-4 py-2 bg-teal-200 text-gray-800 rounded-lg hover:bg-teal-300 transition font-medium"
+                                    className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-700 transition font-semibold"
                                     title="Enable selection"
                                 >
                                     Select
