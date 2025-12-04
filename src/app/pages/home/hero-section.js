@@ -6,7 +6,7 @@ const HeroSection = () => {
 
 
     return (
-        <section className="flex items-center justify-center py-25 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <section className="flex items-center justify-center py-25 px-4 sm:px-6 lg:px-8 bg-gray-100">
             <div className="max-w-3xl w-full text-center">
 
                 {/* AI-Powered Tag */}

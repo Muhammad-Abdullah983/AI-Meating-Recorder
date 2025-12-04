@@ -1,12 +1,12 @@
-import React from 'react';
-// Import the icons used in the dashboard cards
-import { FileText, Calendar, TrendingUp, Clock } from 'lucide-react';
+'use client'
 
+import React, { useEffect, useState, useRef } from 'react'
+import { FileText, Calendar, CheckCircle, Clock } from 'lucide-react'
+import { supabase } from '@/lib/supabaseClient'
 
-const MetricCard = ({ icon: Icon, title, value, change }) => {
-  // Determine if the change is positive (green) or negative (red)
-  const isPositive = change >= 0;
-  const changeColor = isPositive ? 'text-green-600' : 'text-red-500';
+const MetricCard = ({ icon: Icon, title, value, change, isLoading }) => {
+  const isPositive = change >= 0
+  const changeColor = isPositive ? 'text-green-600' : 'text-red-500'
 
   return (
     <div className="
@@ -20,20 +20,19 @@ const MetricCard = ({ icon: Icon, title, value, change }) => {
       hover:shadow-md
     ">
       <div className="flex justify-between items-start mb-4">
-        {/* Title and Value Group */}
         <div className="flex flex-col">
-          {/* Title */}
           <p className="text-sm font-medium text-gray-500 mb-1">
             {title}
           </p>
-
-          {/* Value (e.g., 48, 8, 127, 54m) */}
           <p className="text-3xl font-bold text-gray-800">
-            {value}
+            {isLoading ? (
+              <span className="text-gray-400">-</span>
+            ) : (
+              value
+            )}
           </p>
         </div>
 
-        {/* Icon Badge */}
         <div className="
           w-10 h-10 p-2
           bg-indigo-50
@@ -45,48 +44,147 @@ const MetricCard = ({ icon: Icon, title, value, change }) => {
         </div>
       </div>
 
-      {/* Change Percentage */}
       <p className={`text-sm font-semibold ${changeColor}`}>
-        {/* Format the change with a '+' sign if positive */}
-        {isPositive ? `+${change}%` : `${change}%`}
+        {isLoading ? (
+          <span className="text-gray-400">-</span>
+        ) : (
+          isPositive ? `+${change}%` : `${change}%`
+        )}
       </p>
     </div>
-  );
-};
+  )
+}
 
-// --- Container Component ---
 const DashboardMetrics = () => {
-  // Data for the 4 dashboard metrics
-  const metrics = [
+  const [metrics, setMetrics] = useState({
+    totalMeetings: 0,
+    thisWeek: 0,
+    completedCount: 0,
+    withTranscripts: 0,
+    todayCount: 0,
+    weekChange: 0,
+    completedRate: 0,
+  })
+  const [isLoading, setIsLoading] = useState(true)
+  const hasFetched = useRef(false)
+
+  useEffect(() => {
+    if (hasFetched.current) return
+    hasFetched.current = true
+    fetchMetrics()
+  }, [])
+
+  const fetchMetrics = async () => {
+    try {
+      setIsLoading(true)
+
+      // Get user session
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      // Fetch all meetings for this user
+      const { data: allMeetings, error: allError } = await supabase
+        .from('meetings')
+        .select('id, status, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+
+      if (allError) throw allError
+
+      // Fetch this week's meetings
+      const today = new Date()
+      const weekStart = new Date(today.setDate(today.getDate() - today.getDay()))
+      weekStart.setHours(0, 0, 0, 0)
+
+      const { data: weekMeetings, error: weekError } = await supabase
+        .from('meetings')
+        .select('id, status, created_at')
+        .eq('user_id', user.id)
+        .gte('created_at', weekStart.toISOString())
+
+      if (weekError) throw weekError
+
+      // Compute today's range
+      const todayStart = new Date()
+      todayStart.setHours(0, 0, 0, 0)
+      const todayEnd = new Date()
+      todayEnd.setHours(23, 59, 59, 999)
+
+      // Count meetings by status
+      const completedMeetings = allMeetings.filter(m => m.status === 'completed')
+      const withTranscriptsMeetings = allMeetings.filter(m => m.transcript && m.transcript.length > 0)
+      const todayMeetings = allMeetings.filter(m => {
+        const d = new Date(m.created_at)
+        return d >= todayStart && d <= todayEnd
+      })
+
+      // Calculate completion rate percentage
+      const completedRate = allMeetings.length > 0
+        ? Math.round((completedMeetings.length / allMeetings.length) * 100)
+        : 0
+
+      // Calculate week-over-week change (comparing to previous week)
+      const prevWeekStart = new Date(weekStart)
+      prevWeekStart.setDate(prevWeekStart.getDate() - 7)
+
+      const { data: prevWeekMeetings } = await supabase
+        .from('meetings')
+        .select('id, created_at')
+        .eq('user_id', user.id)
+        .gte('created_at', prevWeekStart.toISOString())
+        .lt('created_at', weekStart.toISOString())
+
+      const weekChange = prevWeekMeetings && prevWeekMeetings.length > 0
+        ? Math.round(((weekMeetings.length - prevWeekMeetings.length) / prevWeekMeetings.length) * 100)
+        : 0
+
+      setMetrics({
+        totalMeetings: allMeetings.length,
+        thisWeek: weekMeetings.length,
+        completedCount: completedMeetings.length,
+        withTranscripts: withTranscriptsMeetings.length,
+        todayCount: todayMeetings.length,
+        weekChange: weekChange,
+        completedRate: completedRate,
+      })
+    } catch (error) {
+      console.error('Error fetching metrics:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const metricCards = [
     {
       id: 1,
       icon: FileText,
       title: 'Total Meetings',
-      value: '48',
-      change: 12, // +12%
+      value: metrics.totalMeetings,
+      change: metrics.weekChange,
     },
     {
       id: 2,
       icon: Calendar,
       title: 'This Week',
-      value: '8',
-      change: -25, // -25%
+      value: metrics.thisWeek,
+      change: metrics.weekChange,
+    },
+       {
+      id: 4,
+      icon: Clock,
+      title: 'Today',
+      value: metrics.todayCount,
+      change: 0,
     },
     {
       id: 3,
-      icon: TrendingUp,
-      title: 'Action Items',
-      value: '127',
-      change: -8, // -8%
+      icon: CheckCircle,
+      title: 'Completed',
+      value: metrics.completedCount,
+      change: metrics.completedRate,
     },
-    {
-      id: 4,
-      icon: Clock,
-      title: 'Avg Duration',
-      value: '54m',
-      change: -5, // -5%
-    },
-  ];
+ 
+  ]
 
   return (
     <div className="py-8 bg-gray-50">
@@ -101,19 +199,20 @@ const DashboardMetrics = () => {
           md:gap-6
           lg:gap-8
         ">
-          {metrics.map((metric) => (
+          {metricCards.map((metric) => (
             <MetricCard
               key={metric.id}
               icon={metric.icon}
               title={metric.title}
               value={metric.value}
               change={metric.change}
+              isLoading={isLoading}
             />
           ))}
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
 export default DashboardMetrics;

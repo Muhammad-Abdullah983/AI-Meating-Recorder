@@ -29,32 +29,29 @@ const TeamMemberCard = ({ name, role, description }) => {
   );
 };
 
-/**
- * Main component: Meet Our Team section for MeetingAI.
- */
 const TeamSection = () => {
   const teamMembers = [
     {
       id: 1,
-      name: 'Mohammad Abdullah',
+      name: 'Abdullah',
       role: 'Chief AI Scientist',
       description: 'Expert in AI and NLP for meeting transcription and insight generation.',
     },
     {
       id: 2,
-      name: 'Muhammad Musa',
+      name: 'Musa',
       role: 'Lead Developer',
       description: 'Full-stack engineer specializing in Next.js, Supabase, and AI integration.',
     },
     {
       id: 3,
-      name: 'Muhammad Essa',
+      name: 'Essa',
       role: 'Data Scientist',
       description: 'AI researcher focused on meeting summarization and Q&A systems.',
     },
     {
       id: 4,
-      name: 'ALi',
+      name: 'Ali',
       role: 'UX Designer',
       description: 'Designs intuitive dashboards for effortless meeting insights.',
     },

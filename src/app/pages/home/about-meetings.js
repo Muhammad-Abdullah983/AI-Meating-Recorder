@@ -25,7 +25,7 @@ const FeatureBox = ({ icon: Icon, title, description }) => {
                 <div className="
           w-12 h-12 p-3
           bg-indigo-50
-          text-indigo-600
+          text-teal-500
           rounded-xl
           flex items-center justify-center
         ">

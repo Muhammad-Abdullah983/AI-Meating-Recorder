@@ -1,8 +1,28 @@
-import React from 'react';
+'use client';
+import { useState, useCallback } from 'react';
 import { Search, Upload } from 'lucide-react';
 import Link from 'next/link';
 
-const SearchAndUploadBar = () => {
+const SearchAndUploadBar = ({ onSearch }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearchChange = useCallback((e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    // Call the parent callback with the search query
+    if (onSearch) {
+      onSearch(query);
+    }
+  }, [onSearch]);
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    if (onSearch) {
+      onSearch('');
+    }
+  };
+
   return (
     <div className="
       max-w-7xl mx-auto px-4 sm:px-6 lg:px-8
@@ -29,6 +49,8 @@ const SearchAndUploadBar = () => {
           <input
             type="text"
             placeholder="Search meetings by title, tags, or participants..."
+            value={searchQuery}
+            onChange={handleSearchChange}
             className="
               flex-grow
               p-4
@@ -40,6 +62,15 @@ const SearchAndUploadBar = () => {
             "
             aria-label="Search recordings"
           />
+          {searchQuery && (
+            <button
+              onClick={handleClearSearch}
+              className="mr-4 text-gray-400 hover:text-gray-600 transition"
+              aria-label="Clear search"
+            >
+              ✕
+            </button>
+          )}
         </div>
 
         {/* Upload Recording Button (Primary Action) */}

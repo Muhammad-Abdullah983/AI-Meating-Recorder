@@ -2,6 +2,30 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Camera, Upload as UploadIcon } from 'lucide-react';
+import { supabase } from '@/lib/supabaseClient'
+
+// Custom verified badge icon (blue filled with white check)
+const VerifiedBadge = ({ className = "w-5 h-5" }) => (
+    <svg
+        className={className}
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+    >
+        <path
+            d="M12 2.75c.7 0 1.37.29 1.85.8l1.17 1.24 1.64-.38c.68-.16 1.41.06 1.88.56l1.2 1.25c.49.51.69 1.24.52 1.92l-.4 1.64 1.25 1.18c.52.49.82 1.17.82 1.87 0 .71-.3 1.39-.82 1.88l-1.25 1.18.4 1.64c.17.68-.03 1.41-.52 1.92l-1.2 1.25c-.47.5-1.2.72-1.88.56l-1.64-.38-1.17 1.24c-.48.51-1.15.8-1.85.8s-1.37-.29-1.85-.8l-1.17-1.24-1.64.38c-.68.16-1.41-.06-1.88-.56l-1.2-1.25c-.49-.51-.69-1.24-.52-1.92l.4-1.64-1.25-1.18c-.52-.49-.82-1.17-.82-1.88 0-.7.3-1.38.82-1.87l1.25-1.18-.4-1.64c-.17-.68.03-1.41.52-1.92l1.2-1.25c.47-.5 1.2-.72 1.88-.56l1.64.38 1.17-1.24c.48-.51 1.15-.8 1.85-.8Z"
+            fill="#1e40af"
+        />
+        <path
+            d="M9.2 12.4l2 2 3.8-3.8"
+            stroke="#ffffff"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+        />
+    </svg>
+);
 
 const ProfilePage = () => {
     const fileInputRef = useRef(null);
@@ -26,6 +50,11 @@ const ProfilePage = () => {
     const [previewPicture, setPreviewPicture] = useState('/profile-pic.jpg');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
+    const [status, setStatus] = useState('available');
+    const [activeTab, setActiveTab] = useState('profile');
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
     // Load profile from localStorage on component mount
     useEffect(() => {
@@ -81,6 +110,7 @@ const ProfilePage = () => {
             if (typeof window !== 'undefined' && userId) {
                 localStorage.setItem(`userProfile_${userId}`, JSON.stringify(profile));
                 localStorage.setItem(`profilePicture_${userId}`, previewPicture);
+                localStorage.setItem(`userStatus_${userId}`, status);
             }
 
             // Simulate API call
@@ -95,25 +125,84 @@ const ProfilePage = () => {
         }
     };
 
+    const handleUpdatePassword = async () => {
+        try {
+            setLoading(true);
+            setMessage('');
+            if (!newPassword || newPassword.length < 6) {
+                setMessage('New password must be at least 6 characters.');
+                return;
+            }
+            if (newPassword !== confirmPassword) {
+                setMessage('New password and confirm password do not match.');
+                return;
+            }
+
+            // Optional: verify current password by re-authenticating
+            if (currentPassword) {
+                const email = user?.email || profile.email;
+                if (!email) {
+                    setMessage('Missing email for re-authentication.');
+                    return;
+                }
+                const { error: signInError } = await supabase.auth.signInWithPassword({
+                    email,
+                    password: currentPassword,
+                });
+                if (signInError) {
+                    setMessage('Current password is incorrect.');
+                    return;
+                }
+            }
+
+            const { error } = await supabase.auth.updateUser({ password: newPassword });
+            if (error) {
+                setMessage(error.message || 'Failed to update password.');
+                return;
+            }
+
+            setMessage('Password updated successfully!');
+            setCurrentPassword('');
+            setNewPassword('');
+            setConfirmPassword('');
+            setTimeout(() => setMessage(''), 3000);
+        } catch (err) {
+            setMessage('Error updating password. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
-            <div className="relative h-48 bg-cover bg-center" style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1523961131990-5ea7c61b2107?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzF8fGFpfGVufDB8fDB8fHww")' }}>
-                {/* Overlay for better contrast */}
-                <div className="absolute inset-0 bg-black/30"></div>
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2">
-                    <div className="relative">
-                        <img
-                            src={previewPicture}
-                            alt="Profile"
-                            className="w-32 h-32 rounded-full border-4 border-white object-cover"
-                        />
-                        <button
-                            onClick={() => fileInputRef.current?.click()}
-                            className="absolute bottom-0 right-0 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition"
-                        >
-                            <Camera className="w-5 h-5 text-teal-600" />
-                        </button>
+            <div className="relative h-52 bg-cover bg-center" style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1523961131990-5ea7c61b2107?w=1200&auto=format&fit=crop&q=60&ixlib=rb-4.1.0")' }}>
+                <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/20"></div>
+                <div className="absolute left-1/2 -translate-x-1/2 bottom-0  translate-y-1/2 w-full max-w-5xl px-6">
+                    <div className="flex items-end gap-4">
+                        <div className="relative pb-4 ">
+                            <img
+                                src={previewPicture}
+                                alt=""
+                                className="w-28 h-28 bg-teal-800 rounded-full border-4 border-white object-cover shadow-md"
+                            />
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                className="absolute bottom-3 -right-1 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition"
+                            >
+                                <Camera className="w-5 h-5 text-teal-600" />
+                            </button>
+                        </div>
+                        <div className="flex-1 pl-2 mt-12 pt-10 text-black">
+                            <div className="flex items-center mt-4 gap-2">
+                                <h1 className="text-2xl md:text-3xl text-black font-bold">{profile.firstName} {profile.lastName}</h1>
+                                <VerifiedBadge className="w-6 h-6" />
+                            </div>
+                            <p className="text-sm md:text-base text-black opacity-90">{profile.email}</p>
+                            <div className="mt-2 flex items-center gap-3">
+
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -127,158 +216,237 @@ const ProfilePage = () => {
                 className="hidden"
             />
 
-            {/* Profile Form */}
-            <div className="max-w-5xl mx-auto mt-20 px-4 sm:px-6 lg:px-8 pb-8">
-                <div className="bg-white shadow-lg rounded-xl p-8">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Profile Information</h2>
-
-                    {/* Message */}
-                    {message && (
-                        <div className={`mb-6 p-4 rounded-lg ${message.includes('successfully') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                            {message}
-                        </div>
-                    )}
-
-                    <div className="grid grid-cols-1 text-black md:grid-cols-2 gap-6">
-                        <div>
-                            <label className="block text-sm font-medium text-black">First Name</label>
-                            <input
-                                type="text"
-                                name="firstName"
-                                placeholder="Enter your first name"
-                                value={profile.firstName}
-                                onChange={handleChange}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Last Name</label>
-                            <input
-                                type="text"
-                                name="lastName"
-                                placeholder="Enter your last name"
-                                value={profile.lastName}
-                                onChange={handleChange}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Email</label>
-                            <input
-                                type="email"
-                                name="email"
-                                placeholder="Enter your email"
-                                value={profile.email}
-                                onChange={handleChange}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Phone</label>
-                            <input
-                                type="text"
-                                name="phone"
-                                placeholder="Enter your phone number"
-                                value={profile.phone}
-                                onChange={handleChange}
-
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Role</label>
-                            <input
-                                type="text"
-                                name="role"
-                                placeholder="Enter your role"
-                                value={profile.role}
-                                onChange={handleChange}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Department</label>
-                            <input
-                                type="text"
-                                name="department"
-                                placeholder="Enter your department"
-                                value={profile.department}
-                                onChange={handleChange}
-
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Location</label>
-                            <input
-                                type="text"
-                                name="location"
-                                placeholder="Enter your location"
-                                value={profile.location}
-                                onChange={handleChange}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
-                            />
-                        </div>
-
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700">Bio</label>
-                            <textarea
-                                name="bio"
-                                placeholder="Tell us about yourself"
-                                value={profile.bio}
-                                onChange={handleChange}
-
-                                rows={3}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">LinkedIn</label>
-                            <input
-                                type="text"
-                                name="linkedin"
-                                placeholder="Enter your LinkedIn URL"
-                                value={profile.linkedin}
-                                onChange={handleChange}
-
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">GitHub</label>
-                            <input
-                                type="text"
-                                name="github"
-                                placeholder="Enter your GitHub URL"
-                                value={profile.github}
-                                onChange={handleChange}
-
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
-                            />
+            {/* Tabs + Content */}
+            <div className="max-w-5xl mx-auto py-34 px-4 sm:px-6 lg:px-8 pb-8">
+                <div className="bg-white shadow-lg rounded-xl">
+                    <div className="border-b px-6 pt-4">
+                        <div className="flex gap-6 ">
+                            <button
+                                className={`py-3 font-semibold ${activeTab === 'profile' ? 'text-teal-700 border-b-2 border-teal-700' : 'text-gray-600'}`}
+                                onClick={() => setActiveTab('profile')}
+                            >
+                                Profile
+                            </button>
+                            <button
+                                className={`py-3 font-semibold ${activeTab === 'password' ? 'text-teal-700 border-b-2 border-teal-700' : 'text-gray-600'}`}
+                                onClick={() => setActiveTab('password')}
+                            >
+                                Password
+                            </button>
                         </div>
                     </div>
+                    <div className="p-8">
+                        {message && (
+                            <div className={`${message.includes('successfully') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'} mb-6 p-4 rounded-lg`}>
+                                {message}
+                            </div>
+                        )}
 
-                    <div className="mt-6 flex justify-end gap-4">
-                        <button
-                            onClick={() => fileInputRef.current?.click()}
-                            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg shadow-md hover:bg-gray-300 transition flex items-center gap-2"
-                        >
-                            <UploadIcon className="w-5 h-5" />
-                            Change Picture
-                        </button>
-                        <button
-                            onClick={handleSaveChanges}
-                            disabled={loading}
-                            className="px-6 py-3 bg-teal-600 text-white rounded-lg shadow-md hover:bg-teal-700 transition disabled:opacity-50"
-                        >
-                            {loading ? 'Saving...' : 'Save Changes'}
-                        </button>
+                        {activeTab === 'profile' && (
+                            <>
+                                <h2 className="text-2xl font-bold text-gray-900 mb-6">Profile Information</h2>
+
+
+
+                                <div className="grid  text-black md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-black">First Name</label>
+                                        <input
+                                            type="text"
+                                            name="firstName"
+                                            placeholder="Enter your first name"
+                                            value={profile.firstName}
+                                            onChange={handleChange}
+                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Last Name</label>
+                                        <input
+                                            type="text"
+                                            name="lastName"
+                                            placeholder="Enter your last name"
+                                            value={profile.lastName}
+                                            onChange={handleChange}
+                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                                        />
+                                    </div>
+
+                                    <div className="">
+                                        <label className="block text-sm font-medium text-gray-700">Username</label>
+                                        <input
+                                            type="text"
+                                            name="username"
+                                            placeholder="your-username"
+                                            value={profile.username || ''}
+                                            onChange={handleChange}
+                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Email</label>
+                                        <input
+                                            type="email"
+                                            name="email"
+                                            placeholder="Enter your email"
+                                            value={profile.email}
+                                            onChange={handleChange}
+                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Phone</label>
+                                        <input
+                                            type="text"
+                                            name="phone"
+                                            placeholder="Enter your phone number"
+                                            value={profile.phone}
+                                            onChange={handleChange}
+
+                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Role</label>
+                                        <input
+                                            type="text"
+                                            name="role"
+                                            placeholder="Enter your role"
+                                            value={profile.role}
+                                            onChange={handleChange}
+                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Department</label>
+                                        <input
+                                            type="text"
+                                            name="department"
+                                            placeholder="Enter your department"
+                                            value={profile.department}
+                                            onChange={handleChange}
+
+                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Location</label>
+                                        <input
+                                            type="text"
+                                            name="location"
+                                            placeholder="Enter your location"
+                                            value={profile.location}
+                                            onChange={handleChange}
+                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                                        />
+                                    </div>
+
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-medium text-gray-700">Bio</label>
+                                        <textarea
+                                            name="bio"
+                                            placeholder="Tell us about yourself"
+                                            value={profile.bio}
+                                            onChange={handleChange}
+
+                                            rows={3}
+                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">LinkedIn</label>
+                                        <input
+                                            type="text"
+                                            name="linkedin"
+                                            placeholder="Enter your LinkedIn URL"
+                                            value={profile.linkedin}
+                                            onChange={handleChange}
+
+                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">GitHub</label>
+                                        <input
+                                            type="text"
+                                            name="github"
+                                            placeholder="Enter your GitHub URL"
+                                            value={profile.github}
+                                            onChange={handleChange}
+
+                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="mt-6 flex justify-end gap-4">
+                                    <button
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg shadow-md hover:bg-gray-300 transition flex items-center gap-2"
+                                    >
+                                        <UploadIcon className="w-5 h-5" />
+                                        Change Picture
+                                    </button>
+                                    <button
+                                        onClick={handleSaveChanges}
+                                        disabled={loading}
+                                        className="px-6 py-3 bg-teal-600 text-white rounded-lg shadow-md hover:bg-teal-700 transition disabled:opacity-50"
+                                    >
+                                        {loading ? 'Saving...' : 'Save Changes'}
+                                    </button>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'password' && (
+                            <>
+                                <h2 className="text-2xl font-bold text-gray-900 mb-6">Change Password</h2>
+                                <div className=" gap-6 text-black">
+                                    <div className="">
+                                        <label className="block text-sm font-medium text-gray-700">Current Password</label>
+                                        <input
+                                            type="password"
+                                            value={currentPassword}
+                                            onChange={(e) => setCurrentPassword(e.target.value)}
+                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">New Password</label>
+                                        <input
+                                            type="password"
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                                        <input
+                                            type="password"
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="mt-6 flex justify-end">
+                                    <button
+                                        onClick={handleUpdatePassword}
+                                        disabled={loading}
+                                        className="px-6 py-3 bg-teal-600 text-white rounded-lg shadow-md hover:bg-teal-700 disabled:opacity-50"
+                                    >
+                                        {loading ? 'Updating...' : 'Update Password'}
+                                    </button>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
