@@ -110,11 +110,6 @@ export const uploadFile = async (file, userId, userName, fileType = "audio") => 
     }
 };
 
-/**
- * Delete a file from Supabase Storage
- * @param {string} filePath - The file path in storage
- * @returns {Promise<{success: boolean, error: string}>}
- */
 export const deleteFile = async (filePath) => {
     try {
         if (!filePath) {
@@ -141,13 +136,7 @@ export const deleteFile = async (filePath) => {
     }
 };
 
-/**
- * List all files for a user
- * @param {string} userName - The user's name/email (sanitized)
- * @param {string} fileType - 'audio', 'video', or 'all' for both
- * @param {string} date - Optional date filter (YYYY-MM-DD)
- * @returns {Promise<{success: boolean, files: Array, error: string}>}
- */
+
 export const listUserFiles = async (userName, fileType = "all", date = null) => {
     try {
         if (!userName) {
@@ -210,12 +199,6 @@ export const listUserFiles = async (userName, fileType = "all", date = null) => 
     }
 };
 
-/**
- * Get file download URL with optional expiration
- * @param {string} filePath - The file path in storage
- * @param {number} expiresIn - Expiration time in seconds (default: 3600)
- * @returns {Promise<{success: boolean, url: string, error: string}>}
- */
 export const getFileDownloadUrl = async (filePath, expiresIn = 3600) => {
     try {
         if (!filePath) {

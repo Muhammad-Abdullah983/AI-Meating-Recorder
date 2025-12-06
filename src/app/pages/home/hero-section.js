@@ -41,13 +41,13 @@ const HeroSection = () => {
 
                     {/* Secondary Button */}
                     <a
-                        href="#"
+                        href="/upload"
                         className="flex items-center justify-center px-8 py-3 text-base font-semibold text-gray-700 bg-white rounded-lg border border-gray-300 shadow-sm hover:bg-gray-50 transition duration-150 ease-in-out"
                     >
-                        Watch Demo
+                      Upload Recording
                     </a>
                 </div>
-                <div className="w-full flex justify-between gap-4 p-6 mt-16">
+                <div className=" flex justify-between gap-4 p-6 mt-16">
 
                     {/* Card 1 */}
                     <div className="flex-1 ">

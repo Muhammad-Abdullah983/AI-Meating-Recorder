@@ -37,9 +37,9 @@ const meetingTips = [
 const TipsCard = () => {
   return (
     <div className="pt-4 flex justify-center">
-      <div className="max-w-7xl w-full px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl w-[95%] px-4 sm:px-6 lg:px-8">
         <div className="
-          p-6 md:p-8 lg:p-10
+          p-10 md:p-8 lg:p-10
           border-2 border-teal-200
           bg-teal-50
           rounded-2xl

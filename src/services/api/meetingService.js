@@ -50,11 +50,6 @@ export const createMeeting = async (meetingData) => {
     }
 };
 
-/**
- * Get a meeting by ID
- * @param {string} meetingId - Meeting ID
- * @returns {Promise<{success: boolean, data: Object, error: string}>}
- */
 export const getMeeting = async (meetingId) => {
     try {
         if (!meetingId) {
@@ -84,12 +79,6 @@ export const getMeeting = async (meetingId) => {
     }
 };
 
-/**
- * Get all meetings for a user
- * @param {string} userId - User ID
- * @param {Object} options - Pagination and filtering options
- * @returns {Promise<{success: boolean, data: Array, count: number, error: string}>}
- */
 export const getUserMeetings = async (userId, options = {}) => {
     try {
         if (!userId) {
@@ -135,12 +124,6 @@ export const getUserMeetings = async (userId, options = {}) => {
     }
 };
 
-/**
- * Update a meeting
- * @param {string} meetingId - Meeting ID
- * @param {Object} updates - Fields to update
- * @returns {Promise<{success: boolean, data: Object, error: string}>}
- */
 export const updateMeeting = async (meetingId, updates) => {
     try {
         if (!meetingId) {
@@ -173,11 +156,6 @@ export const updateMeeting = async (meetingId, updates) => {
     }
 };
 
-/**
- * Delete a meeting record (keeps file in storage)
- * @param {string} meetingId - Meeting ID
- * @returns {Promise<{success: boolean, error: string}>}
- */
 export const deleteMeeting = async (meetingId) => {
     try {
         if (!meetingId) {
@@ -205,12 +183,7 @@ export const deleteMeeting = async (meetingId) => {
     }
 };
 
-/**
- * Search meetings by title or tags
- * @param {string} userId - User ID
- * @param {string} searchTerm - Search term
- * @returns {Promise<{success: boolean, data: Array, error: string}>}
- */
+
 export const searchMeetings = async (userId, searchTerm) => {
     try {
         if (!userId) {

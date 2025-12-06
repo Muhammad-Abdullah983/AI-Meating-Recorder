@@ -10,6 +10,7 @@ import { UploadCloud, Code, Zap, CheckCircle, Users, Lock } from 'lucide-react';
 const FeatureBox = ({ icon: Icon, title, description }) => {
     return (
         <div className="
+      
       p-6 md:p-8
       border border-gray-200
       rounded-xl
@@ -160,7 +161,7 @@ const Aboutmeetings = () => {
 
     return (
         <section className="">
-            <div className=" mx-auto px-4 sm:px-6 pt-25 lg:px-8">
+            <div className=" max-w-7xl w-[95%] mx-auto px-4 sm:px-6 pt-25 lg:px-8">
 
                 {/* Header Section */}
                 <div className="text-center mb-12 md:mb-16 ">

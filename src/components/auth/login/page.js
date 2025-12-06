@@ -4,29 +4,47 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { loginUser } from "@/store/authSlice";
-import { Eye, EyeOff, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema } from "@/lib/validationSchemas";
+import FormInput from "@/components/ui/FormInput";
+import toast from "react-hot-toast";
 
 export default function LoginForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
   const { user, loading, error } = useSelector((state) => state.auth);
   console.log("Current user:", user);
 
-  async function handleLogin(e) {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
+  async function onSubmit(data) {
     try {
-      const result = await dispatch(loginUser({ email, password })).unwrap();
+      const result = await dispatch(loginUser({
+        email: data.email,
+        password: data.password
+      })).unwrap();
 
       if (result) {
+        toast.success("Login successful! Welcome back.");
         router.push("/");
       }
     } catch (err) {
       // Error is already handled in Redux state
       console.error("Login error:", err);
+      toast.error(err || "Login failed. Please check your credentials.");
     }
   }
 
@@ -47,7 +65,7 @@ export default function LoginForm() {
                 <path d="M3 22v-20l18 10-18 10z" />
               </svg>
             </div>
-            <div className="flex flex-col leading-none">
+            <div className="flex flex-col text-left leading-none">
               <span className="text-2xl font-extrabold text-teal-600">
                 MeetingAI
               </span>
@@ -69,53 +87,40 @@ export default function LoginForm() {
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* Email */}
-            <div className="text-black">
-              <label className="block text-sm font-semibold text-gray-800 mb-2">Email</label>
-              <input
-                type="email"
-                placeholder="e.g. daniel@example.com"
-                className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition bg-gray-50 hover:bg-white"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading}
-              />
-            </div>
+            <FormInput
+              label="Email"
+              type="email"
+              placeholder="e.g. daniel@example.com"
+              required
+              error={errors.email?.message}
+              disabled={loading || isSubmitting}
+              {...register("email")}
+            />
 
             {/* Password */}
-            <div className="text-black ">
-              <label className="block text-sm font-semibold text-gray-800 mb-2">Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  className="w-full border border-gray-300 p-3 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition bg-gray-50 hover:bg-white"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={loading}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                  disabled={loading}
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-            </div>
+            <FormInput
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              required
+              error={errors.password?.message}
+              disabled={loading || isSubmitting}
+              showPasswordToggle={true}
+              showPassword={showPassword}
+              onTogglePassword={() => setShowPassword(!showPassword)}
+              {...register("password")}
+            />
 
             {/* Login Button */}
             <button
               type="submit"
               className="w-full bg-linear-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-semibold p-3 rounded-lg transition transform hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
-              disabled={loading}
+              disabled={loading || isSubmitting}
             >
-              {loading ? "Signing in..." : "Sign In"}
-              {!loading && <ArrowRight className="w-5 h-5" />}
+              {loading || isSubmitting ? "Signing in..." : "Sign In"}
+              {!loading && !isSubmitting && <ArrowRight className="w-5 h-5" />}
             </button>
 
             {/* Divider */}

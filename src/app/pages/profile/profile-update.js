@@ -2,7 +2,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Camera, Upload as UploadIcon } from 'lucide-react';
-import { supabase } from '@/lib/supabaseClient'
+import { supabase } from '@/lib/supabaseClient';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { profileSchema, passwordSchema } from '@/lib/validationSchemas';
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 
 // Custom verified badge icon (blue filled with white check)
 const VerifiedBadge = ({ className = "w-5 h-5" }) => (
@@ -45,16 +50,41 @@ const ProfilePage = () => {
         github: ''
     };
 
-    const [profile, setProfile] = useState(defaultProfile);
     const [profilePicture, setProfilePicture] = useState('/profile-pic.jpg');
     const [previewPicture, setPreviewPicture] = useState('/profile-pic.jpg');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
     const [status, setStatus] = useState('available');
     const [activeTab, setActiveTab] = useState('profile');
-    const [currentPassword, setCurrentPassword] = useState('');
-    const [newPassword, setNewPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+
+    // Profile form
+    const {
+        register: registerProfile,
+        handleSubmit: handleSubmitProfile,
+        formState: { errors: profileErrors },
+        watch: watchProfile,
+        setValue: setProfileValue,
+    } = useForm({
+        resolver: zodResolver(profileSchema),
+        defaultValues: defaultProfile,
+    });
+
+    // Password form
+    const {
+        register: registerPassword,
+        handleSubmit: handleSubmitPassword,
+        formState: { errors: passwordErrors, isSubmitting: isPasswordSubmitting },
+        reset: resetPassword,
+    } = useForm({
+        resolver: zodResolver(passwordSchema),
+        defaultValues: {
+            currentPassword: '',
+            newPassword: '',
+            confirmPassword: '',
+        },
+    });
+
+    const profile = watchProfile();
 
     // Load profile from localStorage on component mount
     useEffect(() => {
@@ -64,7 +94,10 @@ const ProfilePage = () => {
 
             if (savedProfile) {
                 try {
-                    setProfile(JSON.parse(savedProfile));
+                    const parsedProfile = JSON.parse(savedProfile);
+                    Object.keys(parsedProfile).forEach(key => {
+                        setProfileValue(key, parsedProfile[key]);
+                    });
                 } catch (error) {
                     console.error('Error loading profile:', error);
                 }
@@ -75,11 +108,7 @@ const ProfilePage = () => {
                 setPreviewPicture(savedProfilePicture);
             }
         }
-    }, [userId]); const handleChange = (e) => {
-        setProfile({ ...profile, [e.target.name]: e.target.value });
-    };
-
-    const handleProfilePictureChange = (e) => {
+    }, [userId, setProfileValue]); const handleProfilePictureChange = (e) => {
         const file = e.target.files?.[0];
         if (file) {
             // Validate file type
@@ -103,12 +132,12 @@ const ProfilePage = () => {
         }
     };
 
-    const handleSaveChanges = async () => {
+    const onProfileSubmit = async (data) => {
         setLoading(true);
         try {
             // Save to localStorage with user-specific key
             if (typeof window !== 'undefined' && userId) {
-                localStorage.setItem(`userProfile_${userId}`, JSON.stringify(profile));
+                localStorage.setItem(`userProfile_${userId}`, JSON.stringify(data));
                 localStorage.setItem(`profilePicture_${userId}`, previewPicture);
                 localStorage.setItem(`userStatus_${userId}`, status);
             }
@@ -125,21 +154,13 @@ const ProfilePage = () => {
         }
     };
 
-    const handleUpdatePassword = async () => {
+    const onPasswordSubmit = async (data) => {
         try {
             setLoading(true);
             setMessage('');
-            if (!newPassword || newPassword.length < 6) {
-                setMessage('New password must be at least 6 characters.');
-                return;
-            }
-            if (newPassword !== confirmPassword) {
-                setMessage('New password and confirm password do not match.');
-                return;
-            }
 
             // Optional: verify current password by re-authenticating
-            if (currentPassword) {
+            if (data.currentPassword) {
                 const email = user?.email || profile.email;
                 if (!email) {
                     setMessage('Missing email for re-authentication.');
@@ -147,7 +168,7 @@ const ProfilePage = () => {
                 }
                 const { error: signInError } = await supabase.auth.signInWithPassword({
                     email,
-                    password: currentPassword,
+                    password: data.currentPassword,
                 });
                 if (signInError) {
                     setMessage('Current password is incorrect.');
@@ -155,16 +176,14 @@ const ProfilePage = () => {
                 }
             }
 
-            const { error } = await supabase.auth.updateUser({ password: newPassword });
+            const { error } = await supabase.auth.updateUser({ password: data.newPassword });
             if (error) {
                 setMessage(error.message || 'Failed to update password.');
                 return;
             }
 
             setMessage('Password updated successfully!');
-            setCurrentPassword('');
-            setNewPassword('');
-            setConfirmPassword('');
+            resetPassword();
             setTimeout(() => setMessage(''), 3000);
         } catch (err) {
             setMessage('Error updating password. Please try again.');
@@ -177,7 +196,7 @@ const ProfilePage = () => {
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
             <div className="relative h-52 bg-cover bg-center" style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1523961131990-5ea7c61b2107?w=1200&auto=format&fit=crop&q=60&ixlib=rb-4.1.0")' }}>
-                <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/20"></div>
+                <div className="absolute inset-0 bg-linear-to-b from-black/40 to-black/20"></div>
                 <div className="absolute left-1/2 -translate-x-1/2 bottom-0  translate-y-1/2 w-full max-w-5xl px-6">
                     <div className="flex items-end gap-4">
                         <div className="relative pb-4 ">
@@ -243,150 +262,95 @@ const ProfilePage = () => {
                         )}
 
                         {activeTab === 'profile' && (
-                            <>
+                            <form onSubmit={handleSubmitProfile(onProfileSubmit)}>
                                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Profile Information</h2>
 
+                                <div className="grid text-black md:grid-cols-2 gap-6">
+                                    <FormInput
+                                        label="First Name"
+                                        type="text"
+                                        placeholder="Enter your first name"
+                                        error={profileErrors.firstName?.message}
+                                        {...registerProfile("firstName")}
+                                    />
+                                    <FormInput
+                                        label="Last Name"
+                                        type="text"
+                                        placeholder="Enter your last name"
+                                        error={profileErrors.lastName?.message}
+                                        {...registerProfile("lastName")}
+                                    />
 
+                                    <FormInput
+                                        label="Email"
+                                        type="email"
+                                        placeholder="Enter your email"
+                                        error={profileErrors.email?.message}
+                                        {...registerProfile("email")}
+                                    />
 
-                                <div className="grid  text-black md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-medium text-black">First Name</label>
-                                        <input
-                                            type="text"
-                                            name="firstName"
-                                            placeholder="Enter your first name"
-                                            value={profile.firstName}
-                                            onChange={handleChange}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Last Name</label>
-                                        <input
-                                            type="text"
-                                            name="lastName"
-                                            placeholder="Enter your last name"
-                                            value={profile.lastName}
-                                            onChange={handleChange}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
-                                        />
-                                    </div>
+                                    <FormInput
+                                        label="Phone"
+                                        type="text"
+                                        placeholder="Enter your phone number"
+                                        error={profileErrors.phone?.message}
+                                        {...registerProfile("phone")}
+                                    />
 
-                                    <div className="">
-                                        <label className="block text-sm font-medium text-gray-700">Username</label>
-                                        <input
-                                            type="text"
-                                            name="username"
-                                            placeholder="your-username"
-                                            value={profile.username || ''}
-                                            onChange={handleChange}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
-                                        />
-                                    </div>
+                                    <FormInput
+                                        label="Role"
+                                        type="text"
+                                        placeholder="Enter your role"
+                                        error={profileErrors.role?.message}
+                                        {...registerProfile("role")}
+                                    />
 
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Email</label>
-                                        <input
-                                            type="email"
-                                            name="email"
-                                            placeholder="Enter your email"
-                                            value={profile.email}
-                                            onChange={handleChange}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Phone</label>
-                                        <input
-                                            type="text"
-                                            name="phone"
-                                            placeholder="Enter your phone number"
-                                            value={profile.phone}
-                                            onChange={handleChange}
+                                    <FormInput
+                                        label="Department"
+                                        type="text"
+                                        placeholder="Enter your department"
+                                        error={profileErrors.department?.message}
+                                        {...registerProfile("department")}
+                                    />
 
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Role</label>
-                                        <input
-                                            type="text"
-                                            name="role"
-                                            placeholder="Enter your role"
-                                            value={profile.role}
-                                            onChange={handleChange}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Department</label>
-                                        <input
-                                            type="text"
-                                            name="department"
-                                            placeholder="Enter your department"
-                                            value={profile.department}
-                                            onChange={handleChange}
-
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Location</label>
-                                        <input
-                                            type="text"
-                                            name="location"
-                                            placeholder="Enter your location"
-                                            value={profile.location}
-                                            onChange={handleChange}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
-                                        />
-                                    </div>
+                                    <FormInput
+                                        label="Location"
+                                        type="text"
+                                        placeholder="Enter your location"
+                                        error={profileErrors.location?.message}
+                                        {...registerProfile("location")}
+                                    />
 
                                     <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700">Bio</label>
-                                        <textarea
-                                            name="bio"
+                                        <FormTextarea
+                                            label="Bio"
                                             placeholder="Tell us about yourself"
-                                            value={profile.bio}
-                                            onChange={handleChange}
-
                                             rows={3}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                                            error={profileErrors.bio?.message}
+                                            {...registerProfile("bio")}
                                         />
                                     </div>
 
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">LinkedIn</label>
-                                        <input
-                                            type="text"
-                                            name="linkedin"
-                                            placeholder="Enter your LinkedIn URL"
-                                            value={profile.linkedin}
-                                            onChange={handleChange}
+                                    <FormInput
+                                        label="LinkedIn"
+                                        type="text"
+                                        placeholder="Enter your LinkedIn URL"
+                                        error={profileErrors.linkedin?.message}
+                                        {...registerProfile("linkedin")}
+                                    />
 
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">GitHub</label>
-                                        <input
-                                            type="text"
-                                            name="github"
-                                            placeholder="Enter your GitHub URL"
-                                            value={profile.github}
-                                            onChange={handleChange}
-
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
-                                        />
-                                    </div>
+                                    <FormInput
+                                        label="GitHub"
+                                        type="text"
+                                        placeholder="Enter your GitHub URL"
+                                        error={profileErrors.github?.message}
+                                        {...registerProfile("github")}
+                                    />
                                 </div>
 
                                 <div className="mt-6 flex justify-end gap-4">
                                     <button
+                                        type="button"
                                         onClick={() => fileInputRef.current?.click()}
                                         className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg shadow-md hover:bg-gray-300 transition flex items-center gap-2"
                                     >
@@ -394,58 +358,52 @@ const ProfilePage = () => {
                                         Change Picture
                                     </button>
                                     <button
-                                        onClick={handleSaveChanges}
+                                        type="submit"
                                         disabled={loading}
                                         className="px-6 py-3 bg-teal-600 text-white rounded-lg shadow-md hover:bg-teal-700 transition disabled:opacity-50"
                                     >
                                         {loading ? 'Saving...' : 'Save Changes'}
                                     </button>
                                 </div>
-                            </>
+                            </form>
                         )}
 
                         {activeTab === 'password' && (
-                            <>
+                            <form onSubmit={handleSubmitPassword(onPasswordSubmit)}>
                                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Change Password</h2>
-                                <div className=" gap-6 text-black">
-                                    <div className="">
-                                        <label className="block text-sm font-medium text-gray-700">Current Password</label>
-                                        <input
-                                            type="password"
-                                            value={currentPassword}
-                                            onChange={(e) => setCurrentPassword(e.target.value)}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">New Password</label>
-                                        <input
-                                            type="password"
-                                            value={newPassword}
-                                            onChange={(e) => setNewPassword(e.target.value)}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Confirm New Password</label>
-                                        <input
-                                            type="password"
-                                            value={confirmPassword}
-                                            onChange={(e) => setConfirmPassword(e.target.value)}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
-                                        />
-                                    </div>
+                                <div className="space-y-6 text-black">
+                                    <FormInput
+                                        label="Current Password"
+                                        type="password"
+                                        placeholder="Enter current password"
+                                        error={passwordErrors.currentPassword?.message}
+                                        {...registerPassword("currentPassword")}
+                                    />
+                                    <FormInput
+                                        label="New Password"
+                                        type="password"
+                                        placeholder="Enter new password"
+                                        error={passwordErrors.newPassword?.message}
+                                        {...registerPassword("newPassword")}
+                                    />
+                                    <FormInput
+                                        label="Confirm New Password"
+                                        type="password"
+                                        placeholder="Confirm new password"
+                                        error={passwordErrors.confirmPassword?.message}
+                                        {...registerPassword("confirmPassword")}
+                                    />
                                 </div>
                                 <div className="mt-6 flex justify-end">
                                     <button
-                                        onClick={handleUpdatePassword}
-                                        disabled={loading}
+                                        type="submit"
+                                        disabled={loading || isPasswordSubmitting}
                                         className="px-6 py-3 bg-teal-600 text-white rounded-lg shadow-md hover:bg-teal-700 disabled:opacity-50"
                                     >
-                                        {loading ? 'Updating...' : 'Update Password'}
+                                        {loading || isPasswordSubmitting ? 'Updating...' : 'Update Password'}
                                     </button>
                                 </div>
-                            </>
+                            </form>
                         )}
                     </div>
                 </div>

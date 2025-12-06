@@ -118,7 +118,7 @@ const MeetingCards = ({ searchQuery = '' }) => {
     }
 
     return (
-        <div className="w-[90%] mx-auto my-8">
+        <div className="sm:w-[90%] w-[87%] max-w-7xl mx-auto my-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                 {filteredMeetings.map((meeting) => (
                     <div

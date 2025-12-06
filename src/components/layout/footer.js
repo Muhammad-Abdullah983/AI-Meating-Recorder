@@ -15,9 +15,9 @@ export default function Footer() {
     }
 
     return (
-        <footer className="w-full bg-gray-900 text-gray-300">
+        <footer className=" bg-gray-900 text-gray-300">
             {/* Main Footer Content */}
-            <div className="max-w-8xl mx-auto px-4 sm:px-6 py-8 sm:py-16 sm:ml-11">
+            <div className="max-w-7xl w-[95%] mx-auto px-4 sm:px-6 py-8 sm:py-16 sm:ml-11">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                     {/* Brand Section */}
                     <div className="col-span-1">
@@ -36,14 +36,14 @@ export default function Footer() {
                                 <span className="text-xs text-gray-500">Meeting Insights</span>
                             </div>
                         </div>
-                        <p className="text-sm text-gray-400">
+                        <p className="text-sm text-gray-400 ">
                             Transform your meetings into actionable insights with AI-powered analysis and summaries.
                         </p>
                     </div>
 
                     {/* Product Links */}
-                    <div className="col-span-1">
-                        <h3 className="text-white font-semibold mb-4">Product</h3>
+                    <div className="col-span-1  ">
+                        <h3 className="text-white text-xl font-semibold mb-4">Product</h3>
                         <ul className="space-y-2">
                             <li>
                                 <Link href="/dashboard" className="text-sm hover:text-teal-400 transition">
@@ -69,8 +69,8 @@ export default function Footer() {
                     </div>
 
                     {/* Resources Links */}
-                    <div className="col-span-1">
-                        <h3 className="text-white font-semibold mb-4">Resources</h3>
+                    <div className="col-span-1 ">
+                        <h3 className="text-white text-xl font-semibold mb-4">Resources</h3>
                         <ul className="space-y-2">
                             <li>
                                 <Link href="#docs" className="text-sm hover:text-teal-400 transition">
@@ -96,11 +96,11 @@ export default function Footer() {
                     </div>
 
                     {/* Company Links */}
-                    <div className="col-span-1">
-                        <h3 className="text-white font-semibold mb-4">Company</h3>
+                    <div className="col-span-1 ">
+                        <h3 className="text-white text-xl font-semibold mb-4">Company</h3>
                         <ul className="space-y-2">
                             <li>
-                                <Link href="#about" className="text-sm hover:text-teal-400 transition">
+                                <Link href="/about" className="text-sm hover:text-teal-400 transition">
                                     About Us
                                 </Link>
                             </li>

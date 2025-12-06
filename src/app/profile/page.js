@@ -1,12 +1,12 @@
 import React from 'react'
 import Profile from '../pages/profile'
+import DashboardWrapper from '@/components/auth/dashboardWrapper'
 
 const page = () => {
   return (
-    <div>
-        <Profile />
-      
-    </div>
+    <DashboardWrapper>
+      <Profile />
+    </DashboardWrapper>
   )
 }
 

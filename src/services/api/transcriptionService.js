@@ -1,12 +1,6 @@
 import { supabase } from "@/lib/supabaseClient";
 
-/**
- * Service to trigger and manage transcription processing via Supabase Edge Function
- */
 
-/**
- * Retry logic with exponential backoff
- */
 const retryWithBackoff = async (fn, maxRetries = 3, initialDelay = 1000) => {
     for (let attempt = 0; attempt < maxRetries; attempt++) {
         try {
@@ -143,11 +137,7 @@ export const getTranscriptionStatus = async (meetingId) => {
     }
 };
 
-/**
- * Fetch transcription results for a meeting
- * @param {string} meetingId - Meeting ID
- * @returns {Promise<{success: boolean, data: Object, error: string}>}
- */
+
 export const getTranscriptionResults = async (meetingId) => {
     try {
         if (!meetingId) {

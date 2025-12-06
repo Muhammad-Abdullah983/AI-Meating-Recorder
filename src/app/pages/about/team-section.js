@@ -24,7 +24,7 @@ const TeamMemberCard = ({ name, role, description }) => {
       <p className="text-sm font-semibold text-teal-500 mb-3">{role}</p>
 
       {/* Description */}
-      <p className="text-sm text-gray-600 max-w-xs leading-relaxed">{description}</p>
+      <p className="text-sm hidden md:block text-gray-600 max-w-xs leading-relaxed">{description}</p>
     </div>
   );
 };

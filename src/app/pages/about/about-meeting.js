@@ -9,7 +9,7 @@ import { BrainCircuit, Sparkles } from 'lucide-react';
 const AboutBanner = () => {
   return (
     <div className="py-16 md:py-24 bg-teal-100 flex justify-center">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="md:max-w-4xl  mx-auto px-6 sm:px-6 lg:px-8 text-center">
         
         {/* Large Central Icon */}
         <div

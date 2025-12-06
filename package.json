@@ -9,15 +9,19 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
     "@reduxjs/toolkit": "^2.11.0",
     "@supabase/supabase-js": "^2.86.0",
     "lucide-react": "^0.555.0",
     "next": "16.0.5",
     "react": "19.2.0",
     "react-dom": "19.2.0",
+    "react-hook-form": "^7.68.0",
+    "react-hot-toast": "^2.6.0",
     "react-icons": "^5.5.0",
     "react-redux": "^9.2.0",
-    "supabase": "^2.64.2"
+    "supabase": "^2.64.2",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

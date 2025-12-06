@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { logoutUser } from "@/store/authSlice";
@@ -10,6 +10,7 @@ import { Menu, X } from "lucide-react";
 export default function Navbar() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
+  const dropdownRef = useRef(null);
   const router = useRouter();
   const pathname = usePathname();
   const dispatch = useDispatch();
@@ -17,6 +18,23 @@ export default function Navbar() {
 
   // Hide navbar on auth pages (login, signup, verify)
   const isAuthPage = pathname?.startsWith('/auth/');
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    }
+
+    if (showDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDropdown]);
 
   if (isAuthPage) {
     return null;
@@ -38,16 +56,16 @@ export default function Navbar() {
   return (
     <>
       <header className="w-full bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40">
-        <nav className="max-w-8xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+        <nav className="max-w-7xl w-[95%] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           {/* Logo - Clickable */}
           <button
             onClick={() => router.push('/')}
-            className="flex items-center space-x-3  hover:cursor-pointer  transition-opacity"
+            className="flex items-center space-x-3 sm:pl-2 hover:cursor-pointer  transition-opacity"
           >
             {/* Play Icon/Logo Symbol */}
             <div className="flex items-center justify-center w-10 h-10 bg-teal-600 rounded-lg shadow-md">
               <svg
-                className="w-5 h-5 text-white fill-current transform translate-x-[1px]"
+                className="w-5 h-5 text-white fill-current  transform translate-x-[1px]"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
               >
@@ -100,7 +118,7 @@ export default function Navbar() {
             </div>
 
             {/* Profile Icon - Desktop */}
-            <div className="hidden md:block relative">
+            <div className="hidden md:block relative" ref={dropdownRef}>
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
                 className={`w-10 h-10 rounded-full font-bold flex items-center justify-center transition ${isAuthenticated
@@ -162,7 +180,7 @@ export default function Navbar() {
             {/* Mobile Menu Toggle - Only visible below md */}
             <button
               onClick={() => setShowSidebar(!showSidebar)}
-              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition"
+              className="md:hidden  rounded-lg hover:bg-gray-100 transition"
             >
               {showSidebar ? (
                 <X className="w-6 h-6 text-gray-700" />
@@ -176,20 +194,20 @@ export default function Navbar() {
 
       {/* Mobile Sidebar - Only visible below md */}
       <div
-        className={`fixed inset-0 z-30 md:hidden transition-opacity duration-300 ${showSidebar ? "opacity-100" : "opacity-0 pointer-events-none"
+        className={`fixed inset-0 z-40 md:hidden transition-opacity duration-300 ${showSidebar ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
         onClick={() => setShowSidebar(false)}
       >
-        <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+        <div className="absolute inset-0 backdrop-blur-[2px] bg-white/10"></div>
       </div>
 
       <aside
-        className={`fixed top-0 left-0 h-screen w-64 bg-white shadow-lg z-30 md:hidden transform transition-transform duration-300 ${showSidebar ? "translate-x-0" : "-translate-x-full"
+        className={`fixed top-0 right-0 h-screen w-64 bg-white shadow-lg z-50 md:hidden transform transition-transform duration-300 ${showSidebar ? "translate-x-0" : "translate-x-full"
           }`}
       >
         {/* Sidebar Header */}
-        <div className="p-6 border-b border-gray-200 bg-teal-600">
-          <div className="flex items-center space-x-3 mb-4">
+        <div className="p-1 border-b  border-gray-200 bg-teal-600">
+          <div className="flex items-center pl-2 md:pt-0 pt-1 space-x-3 mb-4">
             <div className="flex items-center justify-center w-10 h-10 bg-white rounded-lg">
               <svg
                 className="w-5 h-5 text-teal-600 fill-current transform translate-x-[1px]"

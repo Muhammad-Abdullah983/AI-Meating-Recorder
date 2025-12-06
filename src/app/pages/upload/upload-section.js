@@ -6,6 +6,7 @@ import { uploadFile } from '@/services/storage/fileUploadService';
 import { createMeeting } from '@/services/api/meetingService';
 import { triggerTranscriptionProcessing } from '@/services/api/transcriptionService';
 import { useRouter } from 'next/navigation';
+import { validateFile, getFileCategory, formatFileSize } from '@/lib/fileValidation';
 
 const ImageUploadBox = () => {
     const [isDragging, setIsDragging] = useState(false);
@@ -17,21 +18,23 @@ const ImageUploadBox = () => {
     const { user } = useSelector(state => state.auth);
     const router = useRouter();
 
-    // Determine file type (audio or video)
-    const getFileType = (file) => {
-        if (file.type.startsWith('audio/')) return 'audio';
-        if (file.type.startsWith('video/')) return 'video';
-        return null;
-    };
-
     // Handle file upload to Supabase
     const handleFileUpload = async (selectedFile) => {
         if (!selectedFile) return;
 
-        const fileType = getFileType(selectedFile);
-        if (!fileType) {
+        const fileCategory = getFileCategory(selectedFile);
+        if (!fileCategory || (fileCategory !== 'audio' && fileCategory !== 'video')) {
             setUploadStatus('error');
             setUploadMessage('Please select a valid audio or video file');
+            setTimeout(() => setUploadStatus(null), 3000);
+            return;
+        }
+
+        // Validate file with comprehensive validation
+        const validation = validateFile(selectedFile, fileCategory);
+        if (!validation.valid) {
+            setUploadStatus('error');
+            setUploadMessage(validation.error);
             setTimeout(() => setUploadStatus(null), 3000);
             return;
         }
@@ -48,7 +51,7 @@ const ImageUploadBox = () => {
             // Step 1: Upload file to Supabase Storage
             console.log('Uploading file to storage...');
             setUploadMessage('Uploading file...');
-            const uploadResult = await uploadFile(selectedFile, user.id, user.email, fileType);
+            const uploadResult = await uploadFile(selectedFile, user.id, user.email, fileCategory);
 
             if (!uploadResult.success) {
                 throw new Error(uploadResult.error);
@@ -63,7 +66,7 @@ const ImageUploadBox = () => {
                 filePath: uploadResult.path,
                 fileName: uploadResult.fileName,
                 fileSize: uploadResult.fileSize,
-                fileType: fileType,
+                fileType: fileCategory,
                 title: selectedFile.name.split('.')[0] || 'Meeting Recording',
                 meetingName: 'Meeting - ' + new Date().toLocaleDateString(),
                 description: `Uploaded on ${new Date().toLocaleDateString()}`,
@@ -81,7 +84,7 @@ const ImageUploadBox = () => {
             console.log('Triggering transcription processing...');
             const transcriptionResult = await triggerTranscriptionProcessing({
                 filePath: uploadResult.path,
-                fileType: fileType,
+                fileType: fileCategory,
                 fileName: uploadResult.fileName,
                 userId: user.id,
                 meetingId: meetingId,
@@ -220,7 +223,7 @@ const ImageUploadBox = () => {
 
     return (
 
-        <div className="py-10 md:py-16 bg-gray-50 min-h-screen items-start justify-center">
+        <div className="max-w-7xl sm:w-[95%] w-[88%] mx-auto py-10 md:py-16 bg-gray-50 min-h-screen items-start justify-center">
             <div className="text-center mb-10">
                 <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
                     Upload Audio/Video
@@ -327,7 +330,7 @@ const ImageUploadBox = () => {
                             {file.name}
                         </p>
                         <p className="text-gray-600 text-sm">
-                            Size: {(file.size / 1024 / 1024).toFixed(2)} MB
+                            Size: {formatFileSize(file.size)}
                         </p>
                     </div>
                 </div>

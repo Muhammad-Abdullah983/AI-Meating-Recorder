@@ -10,7 +10,7 @@ const MetricCard = ({ icon: Icon, title, value, change, isLoading }) => {
 
   return (
     <div className="
-      p-6
+      p-3 sm:p-6
       border border-gray-200
       rounded-xl
       bg-white
@@ -24,7 +24,7 @@ const MetricCard = ({ icon: Icon, title, value, change, isLoading }) => {
           <p className="text-sm font-medium text-gray-500 mb-1">
             {title}
           </p>
-          <p className="text-3xl font-bold text-gray-800">
+          <p className="text-3xl  font-bold text-gray-800">
             {isLoading ? (
               <span className="text-gray-400">-</span>
             ) : (
@@ -38,7 +38,7 @@ const MetricCard = ({ icon: Icon, title, value, change, isLoading }) => {
           bg-indigo-50
           text-indigo-600
           rounded-lg
-          flex items-center justify-center
+          flex items-center justify-center hidden md:flex
         ">
           <Icon className="w-5 h-5" />
         </div>
@@ -188,8 +188,8 @@ const DashboardMetrics = () => {
 
   return (
     <div className="py-8 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
+      <div className="max-w-7xl w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-xl sm:text-2xl lg:3xl font-bold text-gray-900 mb-8">
           Dashboard Overview
         </h1>
         <div className="

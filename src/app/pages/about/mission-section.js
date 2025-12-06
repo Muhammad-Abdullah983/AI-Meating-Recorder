@@ -10,7 +10,7 @@ const metrics = [
 const MissionMetrics = () => {
   return (
     <section className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header: Mission */}
         <div className="text-center mb-16">

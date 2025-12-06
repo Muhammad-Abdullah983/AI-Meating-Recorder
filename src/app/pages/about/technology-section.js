@@ -8,7 +8,6 @@ const TechnologyBox = ({ title, description, points }) => {
         bg-teal-50
         rounded-xl
         shadow-lg
-        h-full
         flex flex-col
       "
     >
@@ -67,7 +66,7 @@ const TechnologySection = () => {
 
   return (
     <section className="py-10 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
         <div className="text-center mb-12 md:mb-16">
