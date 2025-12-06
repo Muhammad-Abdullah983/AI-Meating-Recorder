@@ -49,10 +49,10 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="fixed inset-0 bg-white flex pt-8 items-center justify-center px-4">
+    <div className="fixed inset-0  bg-white flex pt-8 items-center justify-center px-4">
       {/* Background Blobs */}
 
-      <div className="w-full max-w-md">
+      <div className="w-full  md:max-w-[30%] max-w-[92%]">
         {/* Header */}
         <div className="mb-8 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
@@ -80,12 +80,6 @@ export default function LoginForm() {
           <h2 className="text-3xl text-center font-bold text-gray-900 mb-2">Welcome Back</h2>
           <p className="text-gray-600 text-center text-sm mb-6">Sign in to your account to continue</p>
 
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-6 flex items-center gap-2">
-              <span className="text-lg">⚠️</span>
-              {error}
-            </div>
-          )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* Email */}

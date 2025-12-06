@@ -187,13 +187,7 @@ export default function VerifyForm() {
           <h2 className="text-3xl text-center font-bold text-gray-900 mb-2">Verify Email</h2>
           <p className="text-gray-600 text-center text-sm mb-6">Enter the 6-digit code we sent to your email</p>
 
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-6 flex items-center gap-2">
-              <span className="text-lg">⚠️</span>
-              {error}
-            </div>
-          )}
-
+        
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* OTP Input */}
             <FormInput

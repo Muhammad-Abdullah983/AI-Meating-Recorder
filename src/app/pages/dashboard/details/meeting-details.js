@@ -1,7 +1,7 @@
 'use client';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { Edit, Users } from 'lucide-react'
 
 const MeetingDetailsPage = ({ meetingId }) => {
@@ -13,6 +13,7 @@ const MeetingDetailsPage = ({ meetingId }) => {
     const [isTyping, setIsTyping] = useState(false);
     const [isEditingName, setIsEditingName] = useState(false);
     const [tempName, setTempName] = useState('');
+    const messagesEndRef = useRef(null);
     const router = useRouter();
 
     const fetchMeetingDetails = async (meetingId) => {
@@ -44,6 +45,11 @@ const MeetingDetailsPage = ({ meetingId }) => {
             fetchMeetingDetails(meetingId);
         }
     }, [meetingId]);
+
+    // Auto-scroll to latest message
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
+    }, [messages, isTyping]);
 
     if (loading) {
         return (
@@ -248,47 +254,48 @@ const MeetingDetailsPage = ({ meetingId }) => {
     };
 
     return (
-        <div className="max-w-6xl mx-auto px-5 py-6 bg-gray-50 min-h-screen">
+        <div className="max-w-7xl md:w-[92%] w-[97%] mx-auto px-5 py-6 bg-gray-50 min-h-screen">
             {/* Header */}
-            <div className=" p-8 mb-6">
+            <div className=" py-4 mb-6">
                 <div className="flex flex-col gap-4">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-start gap-3">
                         {isEditingName ? (
-                            <div className="flex items-center gap-2">
+                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full">
                                 <input
                                     type="text"
                                     value={tempName}
                                     onChange={(e) => setTempName(e.target.value)}
-                                    className="text-4xl font-bold text-gray-900 bg-transparent border-b border-gray-300 focus:outline-none focus:border-teal-600"
+                                    className="flex-1 md:text-4xl text-xl font-bold text-gray-900 bg-transparent border-b-2 border-gray-300 focus:outline-none focus:border-teal-600 px-2 py-1"
                                 />
-                                <button
-                                    onClick={saveEditName}
-                                    className="px-3 py-1 bg-teal-600 text-white rounded-md text-sm hover:bg-teal-700"
-                                >
-                                    Save
-                                </button>
-                                <button
-                                    onClick={cancelEditName}
-                                    className="px-3 py-1 bg-gray-200 text-gray-800 rounded-md text-sm hover:bg-gray-300"
-                                >
-                                    Cancel
-                                </button>
+                                <div className="flex gap-2 shrink-0">
+                                    <button
+                                        onClick={saveEditName}
+                                        className="px-4 py-2 bg-teal-600 text-white rounded-md text-sm font-medium hover:bg-teal-700 whitespace-nowrap"
+                                    >
+                                        Save
+                                    </button>
+                                    <button
+                                        onClick={cancelEditName}
+                                        className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md text-sm font-medium hover:bg-gray-300 whitespace-nowrap"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
                             </div>
                         ) : (
                             <>
-                                <h1 className="text-4xl font-bold text-gray-900">{data.meeting_name}</h1>
+                                <h1 className="md:text-4xl text-xl font-bold text-black break-words flex-1">{data.meeting_name}</h1>
                                 <button
                                     onClick={startEditName}
                                     aria-label="Edit meeting name"
                                     title="Edit meeting name"
-                                    className="p-2 rounded-md border border-gray-200 text-teal-700 hover:bg-teal-100 hover:text-teal-900"
+                                    className="p-2 rounded-md border border-gray-200 text-teal-700 hover:bg-teal-100 hover:text-teal-900 shrink-0"
                                 >
                                     <Edit className="w-4 h-4" />
                                 </button>
                             </>
                         )}
                     </div>
-                    {/* <p className="text-base text-gray-600">{data.description}</p> */}
                     <div className="flex flex-wrap gap-6 mt-3">
                         <span className="flex items-center gap-2 text-sm text-gray-700">
                             <span className="font-semibold text-gray-900">Uploaded:</span>
@@ -304,7 +311,7 @@ const MeetingDetailsPage = ({ meetingId }) => {
                                 {data.status}
                             </span>
                         </span>
-                      
+
                     </div>
                 </div>
             </div>
@@ -407,7 +414,7 @@ const MeetingDetailsPage = ({ meetingId }) => {
                             <div className="flex flex-col gap-4">
                                 <div className="flex items-center gap-2">
                                     <Users className="w-6 h-6 text-teal-600" />
-                                <h3 className="text-lg font-bold text-gray-900"> Participants</h3>
+                                    <h3 className="text-lg font-bold text-gray-900"> Participants</h3>
                                 </div>
                                 {Array.isArray(data.participants) && data.participants.length > 0 ? (
                                     <ul className="flex flex-col gap-2">
@@ -498,6 +505,7 @@ const MeetingDetailsPage = ({ meetingId }) => {
                                         </div>
                                     </div>
                                 )}
+                                <div ref={messagesEndRef} />
                             </div>
 
                             {/* Input Area */}
@@ -527,13 +535,13 @@ const MeetingDetailsPage = ({ meetingId }) => {
             <div className="mt-8 flex gap-4 justify-center pb-8">
                 <button
                     onClick={() => router.push('/upload')}
-                    className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg hover:bg-teal-700 transition-colors duration-200 flex items-center gap-2"
+                    className="md:px-6 px-2 py-2 md:py-3 text-sm md:text-lg bg-teal-600 text-white font-bold rounded-lg hover:bg-teal-700 transition-colors duration-200 flex items-center gap-2"
                 >
                     Upload Another File
                 </button>
                 <button
                     onClick={() => router.push('/dashboard')}
-                    className="px-6 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2"
+                    className="md:px-6 px-2 py-2 md:py-3 text-sm md:text-lg bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2"
                 >
                     ← Back to Dashboard
                 </button>

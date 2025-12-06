@@ -143,7 +143,7 @@ export default function SignupForm() {
   return (
     <div className="min-h-screen bg-white flex pt-6 items-start md:items-center justify-center px-4 overflow-y-auto">
 
-      <div className="w-full max-w-2xl">
+      <div className="w-full max-w-2xl md:max-w-[50%] max-w-[97%]">
         {/* Header */}
         <div className=" text-left">
           <div className="flex items-center justify-center gap-3 mb-8">
@@ -169,7 +169,7 @@ export default function SignupForm() {
         </div>
 
         <div className="">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Sign Up To Get Started</h2>
+          <h2 className="text-3xl font-bold text-center text-black mb-8">Sign Up To Get Started</h2>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* First Name & Last Name Row */}
@@ -253,6 +253,16 @@ export default function SignupForm() {
               {loading || isSubmitting ? "Creating Account..." : "Sign Up"}
               {!loading && !isSubmitting && <ArrowRight className="w-5 h-5" />}
             </button>
+            {/* Divider */}
+
+            <div className="relative mt-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-3 bg-white text-gray-500 font-medium">or</span>
+              </div>
+            </div>
 
             {/* Sign In Link */}
             <p className="text-center text-gray-600 text-sm">
