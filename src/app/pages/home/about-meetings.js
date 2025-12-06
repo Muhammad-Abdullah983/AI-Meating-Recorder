@@ -161,7 +161,7 @@ const Aboutmeetings = () => {
 
     return (
         <section className="">
-            <div className=" max-w-7xl w-[95%] mx-auto px-4 sm:px-6 pt-25 lg:px-8">
+            <div className=" max-w-7xl w-[95%] mx-auto px-4 sm:px-6 pt-12 md:pt-25 lg:px-8">
 
                 {/* Header Section */}
                 <div className="text-center mb-12 md:mb-16 ">

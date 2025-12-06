@@ -143,7 +143,7 @@ export default function SignupForm() {
   return (
     <div className="min-h-screen bg-white flex pt-6 items-start md:items-center justify-center px-4 overflow-y-auto">
 
-      <div className="w-full max-w-2xl md:max-w-[50%] max-w-[97%]">
+      <div className="w-full max-w-2xl md:max-w-[50%] py-8 max-w-[97%]">
         {/* Header */}
         <div className=" text-left">
           <div className="flex items-center justify-center gap-3 mb-8">

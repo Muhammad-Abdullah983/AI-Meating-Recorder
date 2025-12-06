@@ -369,7 +369,7 @@ const MeetingDetailsPage = ({ meetingId }) => {
                 </div>
 
                 {/* Tab Content */}
-                <div className="p-8">
+                <div className="md:p-8 p-4">
                     {/* Summary Tab */}
                     {activeTab === 'summary' && (
                         <div className="flex flex-col gap-8">
@@ -452,7 +452,7 @@ const MeetingDetailsPage = ({ meetingId }) => {
                     {activeTab === 'qaTab' && (
                         <div className="flex flex-col gap-4 h-[600px]">
                             {/* Chat Messages Container */}
-                            <div className="flex-1 overflow-y-auto bg-gray-50 rounded-lg p-4 space-y-4">
+                            <div className="flex-1 overflow-y-auto  rounded-lg p-4 space-y-4">
                                 {messages.length === 0 ? (
                                     <div className="flex items-center justify-center h-full">
                                         <div className="text-center flex flex-col gap-3">
@@ -535,13 +535,13 @@ const MeetingDetailsPage = ({ meetingId }) => {
             <div className="mt-8 flex gap-4 justify-center pb-8">
                 <button
                     onClick={() => router.push('/upload')}
-                    className="md:px-6 px-2 py-2 md:py-3 text-sm md:text-lg bg-teal-600 text-white font-bold rounded-lg hover:bg-teal-700 transition-colors duration-200 flex items-center gap-2"
+                    className="md:px-6 px-4 py-3 md:py-3 text-sm md:text-lg bg-teal-600 text-white font-bold rounded-lg hover:bg-teal-700 transition-colors duration-200 flex items-center gap-2"
                 >
                     Upload Another File
                 </button>
                 <button
                     onClick={() => router.push('/dashboard')}
-                    className="md:px-6 px-2 py-2 md:py-3 text-sm md:text-lg bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2"
+                    className="md:px-6 px-4 py-3 md:py-3 text-sm md:text-lg bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2"
                 >
                     ← Back to Dashboard
                 </button>

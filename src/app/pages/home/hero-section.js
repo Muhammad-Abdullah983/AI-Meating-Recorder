@@ -6,7 +6,7 @@ const HeroSection = () => {
 
 
     return (
-        <section className="flex items-center justify-center py-25 px-4 sm:px-6 lg:px-8 bg-gray-100">
+        <section className="flex items-center justify-center pt-18 md:py-20 px-4 sm:px-6 lg:px-8 bg-gray-100">
             <div className="max-w-3xl w-full text-center">
 
                 {/* AI-Powered Tag */}
@@ -33,7 +33,7 @@ const HeroSection = () => {
                     <a href="/dashboard">
 
 
-                        <button className="flex items-center justify-center px-8 py-4 text-base font-semibold text-white bg-teal-600 rounded-lg shadow-md hover:bg-teal-700 transition duration-150 ease-in-out"
+                        <button className="flex items-center justify-center px-4 py-4 md:px-8 md:py-4 text-sm md:text-base font-semibold text-white bg-teal-600 rounded-lg shadow-md hover:bg-teal-700 transition duration-150 ease-in-out"
                         >
                             View Dashboard →
                         </button>
@@ -42,17 +42,17 @@ const HeroSection = () => {
                     {/* Secondary Button */}
                     <a
                         href="/upload"
-                        className="flex items-center justify-center px-8 py-3 text-base font-semibold text-gray-700 bg-white rounded-lg border border-gray-300 shadow-sm hover:bg-gray-50 transition duration-150 ease-in-out"
+                        className="flex items-center justify-center px-4 py-4 md:px-8 md:py-4 text-sm md:text-base font-semibold text-gray-700 bg-white rounded-lg border border-gray-300 shadow-sm hover:bg-gray-50 transition duration-150 ease-in-out"
                     >
                       Upload Recording
                     </a>
                 </div>
-                <div className=" flex justify-between gap-4 p-6 mt-16">
+                <div className=" flex justify-between gap-4 p-6 pt-14 sm:mt-16">
 
                     {/* Card 1 */}
                     <div className="flex-1 ">
                         <h2 className="text-3xl text-teal-600 font-semibold">10K+</h2>
-                        <p className="text-gray-600 mt-1">Meetings Processed</p>
+                        <p className="text-gray-600 mt-1"> Processed</p>
                     </div>
 
                     {/* Card 2 */}
