@@ -42,7 +42,7 @@ const HeroSection = () => {
                     {/* Secondary Button */}
                     <a
                         href="/upload"
-                        className="flex items-center justify-center px-4 py-4 md:px-8 md:py-4 text-sm md:text-base font-semibold text-gray-700 bg-white rounded-lg border border-gray-300 shadow-sm hover:bg-gray-50 transition duration-150 ease-in-out"
+                        className="flex items-center cursor-pointer justify-center px-4 py-4 md:px-8 md:py-4 text-sm md:text-base font-semibold text-gray-700 bg-white rounded-lg border border-gray-300 shadow-sm hover:bg-gray-50 transition duration-150 ease-in-out"
                     >
                       Upload Recording
                     </a>

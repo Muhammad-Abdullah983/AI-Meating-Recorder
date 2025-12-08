@@ -304,6 +304,7 @@ const ImageUploadBox = () => {
                                 font-semibold
                                 rounded-lg
                                 shadow-md
+                                cursor-pointer
                                 hover:bg-teal-700
                                 transition duration-200
                                 disabled:opacity-50
@@ -392,6 +393,7 @@ const ImageUploadBox = () => {
                       text-white
                       font-semibold
                       rounded-lg
+                      cursor-pointer
                       shadow-md
                       hover:bg-teal-700
                       transition duration-200

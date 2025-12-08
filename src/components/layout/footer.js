@@ -17,11 +17,15 @@ export default function Footer() {
     return (
         <footer className=" bg-gray-900 text-gray-300">
             {/* Main Footer Content */}
-            <div className="max-w-7xl w-[95%] mx-auto px-4 sm:px-6 py-8 sm:py-16 sm:ml-11">
+
+            <div className="max-w-7xl w-[92%] mx-auto px-4 sm:px-6 py-8 sm:py-16">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                     {/* Brand Section */}
+
                     <div className="col-span-1">
-                        <div className="flex items-center space-x-2 mb-4">
+
+                        <Link href="/" className="flex items-center space-x-2 mb-4 hover:cursor-pointer transition-opacity">
+
                             <div className="flex items-center justify-center w-10 h-10 bg-teal-600 rounded-lg shadow-md">
                                 <svg
                                     className="w-5 h-5 text-white fill-current transform translate-x-px"
@@ -31,11 +35,11 @@ export default function Footer() {
                                     <path d="M3 22v-20l18 10-18 10z" />
                                 </svg>
                             </div>
-                            <div className="flex flex-col leading-none">
-                                <span className="text-lg font-extrabold text-teal-400">MeetingAI</span>
-                                <span className="text-xs text-gray-500">Meeting Insights</span>
+                            <div className="flex flex-col leading-none pl-1">
+                                <span className="text-xl md:text-2xl font-extrabold text-teal-600">MeetingAI</span>
+                                <span className="text-sm text-gray-500">Intelligent Meeting Insights</span>
                             </div>
-                        </div>
+                        </Link>
                         <p className="text-sm text-gray-400 ">
                             Transform your meetings into actionable insights with AI-powered analysis and summaries.
                         </p>

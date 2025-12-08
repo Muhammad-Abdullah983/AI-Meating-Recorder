@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState, useRef } from 'react'
 import { Edit, Users } from 'lucide-react'
+import { FaSpinner } from "react-icons/fa6";
 
 const MeetingDetailsPage = ({ meetingId }) => {
     const [data, setData] = useState(null);
@@ -54,7 +55,10 @@ const MeetingDetailsPage = ({ meetingId }) => {
     if (loading) {
         return (
             <div className="max-w-6xl mx-auto px-5 py-5 bg-gray-50 min-h-screen flex items-center justify-center">
-                <div className="text-lg text-gray-600">Loading meeting details...</div>
+                <div className="text-lg text-gray-600">
+                    <FaSpinner className='w-8 h-8 animate-spin text-teal-600' />
+
+                </div>
             </div>
         );
     }
@@ -284,7 +288,7 @@ const MeetingDetailsPage = ({ meetingId }) => {
                             </div>
                         ) : (
                             <>
-                                <h1 className="md:text-4xl text-xl font-bold text-black break-words flex-1">{data.meeting_name}</h1>
+                                <h1 className="md:text-4xl text-xl font-bold text-black break-words">{data.meeting_name}</h1>
                                 <button
                                     onClick={startEditName}
                                     aria-label="Edit meeting name"
@@ -340,8 +344,8 @@ const MeetingDetailsPage = ({ meetingId }) => {
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
                 <div className="flex border-b-2 border-gray-200 ">
                     <button
-                        className={`flex-1 px-5 py-4 font-semibold text-sm transition-all ${activeTab === 'summary'
-                            ? 'text-blue-600 border-b-4 border-blue-600 -mb-0.5'
+                        className={`flex-1 cursor-pointer px-5 py-4 font-semibold text-sm transition-all ${activeTab === 'summary'
+                            ? 'text-teal-600 border-b-4 border-teal-600 -mb-0.5'
                             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                             }`}
                         onClick={() => setActiveTab('summary')}
@@ -349,8 +353,8 @@ const MeetingDetailsPage = ({ meetingId }) => {
                         Summary
                     </button>
                     <button
-                        className={`flex-1 px-5 py-4 font-semibold text-sm transition-all ${activeTab === 'transcript'
-                            ? 'text-blue-600 border-b-4 border-blue-600 -mb-0.5'
+                        className={`flex-1 cursor-pointer px-5 py-4 font-semibold text-sm transition-all ${activeTab === 'transcript'
+                            ? 'text-teal-600 border-b-4 border-teal-600 -mb-0.5'
                             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                             }`}
                         onClick={() => setActiveTab('transcript')}
@@ -358,8 +362,8 @@ const MeetingDetailsPage = ({ meetingId }) => {
                         Transcript
                     </button>
                     <button
-                        className={`flex-1 px-5 py-4 font-semibold text-sm transition-all ${activeTab === 'qaTab'
-                            ? 'text-blue-600 border-b-4 border-blue-600 -mb-0.5'
+                        className={`flex-1 cursor-pointer px-5 py-4 font-semibold text-sm transition-all ${activeTab === 'qaTab'
+                            ? 'text-teal-600 border-b-4 border-teal-600 -mb-0.5'
                             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                             }`}
                         onClick={() => setActiveTab('qaTab')}
@@ -425,9 +429,9 @@ const MeetingDetailsPage = ({ meetingId }) => {
                                                 </span>
                                                 <div className="flex-1">
                                                     <p className="text-sm font-semibold text-gray-900">{p.name}</p>
-                                                    {p.email && (
-                                                        <p className="text-xs text-gray-600">{p.email}</p>
-                                                    )}
+                                                    {/* {p.email && (
+                                                        // <p className="text-xs text-gray-600">{p.email}</p>
+                                                    )} */}
                                                 </div>
                                             </li>
                                         ))}
@@ -535,13 +539,13 @@ const MeetingDetailsPage = ({ meetingId }) => {
             <div className="mt-8 flex gap-4 justify-center pb-8">
                 <button
                     onClick={() => router.push('/upload')}
-                    className="md:px-6 px-4 py-3 md:py-3 text-sm md:text-lg bg-teal-600 text-white font-bold rounded-lg hover:bg-teal-700 transition-colors duration-200 flex items-center gap-2"
+                    className="md:px-6 px-4 py-4 md:py-3 text-sm md:text-lg bg-teal-600 text-white font-bold rounded-lg hover:bg-teal-700 transition-colors duration-200 flex items-center gap-2"
                 >
                     Upload Another File
                 </button>
                 <button
                     onClick={() => router.push('/dashboard')}
-                    className="md:px-6 px-4 py-3 md:py-3 text-sm md:text-lg bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2"
+                    className="md:px-6 px-4 py-4 md:py-3 text-sm md:text-lg bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2"
                 >
                     ← Back to Dashboard
                 </button>

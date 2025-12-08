@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CheckCircle2, AlertCircle, Loader, FileVideo, Calendar, Users } from 'lucide-react'
 import { supabase } from '@/lib/supabaseClient'
+import { FaSpinner } from "react-icons/fa6";
+
 
 const MeetingCards = ({ searchQuery = '' }) => {
     const router = useRouter()
@@ -86,8 +88,11 @@ const MeetingCards = ({ searchQuery = '' }) => {
         return (
             <div className="w-full py-12 flex justify-center items-center">
                 <div className="text-center">
-                    <Loader className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-3" />
-                    <p className="text-gray-600 font-medium">Loading meetings...</p>
+                    
+                    <p className="text-gray-600 font-medium">
+                        <FaSpinner className='w-8 h-8 animate-spin text-teal-600' />
+
+                    </p>
                 </div>
             </div>
         )

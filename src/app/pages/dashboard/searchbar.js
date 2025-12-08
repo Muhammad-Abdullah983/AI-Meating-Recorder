@@ -78,6 +78,7 @@ const SearchAndUploadBar = ({ onSearch }) => {
           <button
             className="
               flex items-center justify-center
+              cursor-pointer
               gap-2
               px-6 py-3
               bg-teal-700
