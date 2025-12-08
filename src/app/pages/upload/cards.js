@@ -24,6 +24,9 @@ const FeatureCard = ({ icon: Icon, iconBg, iconText, title, description }) => {
       flex flex-col items-center
       transition duration-300 ease-in-out
       hover:shadow-lg
+        hover:border-teal-600
+              hover:border-2
+        cursor-pointer
     ">
       {/* Icon Area */}
       <div className={`

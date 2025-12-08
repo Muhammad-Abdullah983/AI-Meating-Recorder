@@ -19,6 +19,9 @@ const FeatureBox = ({ icon: Icon, title, description }) => {
       hover:shadow-lg
       transform transition duration-300 ease-in-out
       flex flex-col
+        hover:border-teal-600
+              hover:border-2
+        cursor-pointer
     ">
             {/* Icon Area */}
             <div className="mb-4">
@@ -52,7 +55,7 @@ const FeatureBox = ({ icon: Icon, title, description }) => {
 const CallToAction = () => {
     return (
         <div className="
-      mt-20 py-12 md:py-25 bg-teal-500  text-center ">
+      mt-20 py-12 md:py-25 bg-teal-600  text-center ">
             <div className="max-w-4xl mx-auto px-4">
                 {/* Headline */}
                 <h2 className="
@@ -86,6 +89,8 @@ const CallToAction = () => {
               shadow-lg
               hover:bg-gray-100
               transition duration-300 ease-in-out
+              cursor-pointer
+            
               transform hover:scale-[1.02]
               w-full sm:w-auto
             "
@@ -179,6 +184,7 @@ const Aboutmeetings = () => {
           gap-8
           md:grid-cols-2
           lg:grid-cols-3
+          
         ">
                     {features.map((feature) => (
                         <FeatureBox

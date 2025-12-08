@@ -33,7 +33,7 @@ const HeroSection = () => {
                     <a href="/dashboard">
 
 
-                        <button className="flex items-center justify-center px-4 py-4 md:px-8 md:py-4 text-sm md:text-base font-semibold text-white bg-teal-600 rounded-lg shadow-md hover:bg-teal-700 transition duration-150 ease-in-out"
+                        <button className="flex items-center cursor-pointer justify-center px-4 py-4 md:px-8 md:py-4 text-sm md:text-base font-semibold text-white bg-teal-600 rounded-lg shadow-md hover:bg-teal-700 transition duration-150 ease-in-out"
                         >
                             View Dashboard →
                         </button>

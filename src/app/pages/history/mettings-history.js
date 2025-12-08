@@ -2,9 +2,8 @@
 
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { FileText, Trash2, Eye, Loader, RefreshCw } from 'lucide-react'
+import { FileText, Trash2, Eye, Loader } from 'lucide-react'
 import { supabase } from '@/lib/supabaseClient'
-import { triggerTranscriptionProcessing } from '@/services/api/transcriptionService'
 import toast from 'react-hot-toast'
 
 
@@ -13,7 +12,6 @@ const MeetingHistory = () => {
     const [meetings, setMeetings] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     const [deleteConfirm, setDeleteConfirm] = useState(null)
-    const [retryingId, setRetryingId] = useState(null)
     const [selectedIds, setSelectedIds] = useState([])
     const [selectionMode, setSelectionMode] = useState(false)
 
@@ -127,37 +125,6 @@ const MeetingHistory = () => {
         setSelectionMode(false)
         setSelectedIds([])
     }
-
-    const handleRetryTranscription = async (meeting) => {
-        try {
-            setRetryingId(meeting.id)
-            console.log('Retrying transcription for meeting:', meeting.id)
-
-            const result = await triggerTranscriptionProcessing({
-                filePath: meeting.file_path,
-                fileType: meeting.file_type,
-                fileName: meeting.file_name,
-                userId: meeting.user_id,
-                meetingId: meeting.id,
-            })
-
-            if (result.success) {
-                toast.success('Transcription retry initiated! Processing will start shortly.');
-                // Update meeting status to processing
-                setMeetings(meetings.map(m =>
-                    m.id === meeting.id ? { ...m, status: 'processing' } : m
-                ))
-            } else {
-                toast.error(`Retry failed: ${result.error}. Please try again later.`);
-            }
-        } catch (error) {
-            console.error('Error retrying transcription:', error)
-            toast.error('Error retrying transcription. Please try again.');
-        } finally {
-            setRetryingId(null)
-        }
-    }
-
 
 
     return (
@@ -286,20 +253,6 @@ const MeetingHistory = () => {
                                             >
                                                 <Eye className="w-5 h-5" />
                                             </button>
-                                            {!meeting.transcript && meeting.file_path && (
-                                                <button
-                                                    onClick={() => handleRetryTranscription(meeting)}
-                                                    disabled={retryingId === meeting.id}
-                                                    className="text-orange-600 hover:text-orange-900 transition p-2 hover:bg-orange-50 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                                                    title="Retry Transcription"
-                                                >
-                                                    {retryingId === meeting.id ? (
-                                                        <Loader className="w-5 h-5 animate-spin" />
-                                                    ) : (
-                                                        <RefreshCw className="w-5 h-5" />
-                                                    )}
-                                                </button>
-                                            )}
                                             <button
                                                 onClick={() => setDeleteConfirm(meeting.id)}
                                                 className="text-red-500 hover:text-red-900 transition p-2 hover:bg-red-50 rounded"

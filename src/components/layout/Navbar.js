@@ -89,18 +89,19 @@ export default function Navbar() {
             {/* Desktop Menu - Only visible on md and above */}
             <div className="hidden md:flex items-center gap-6">
               <Link
+                href="/dashboard"
+                className="relative text-black after:content-[''] after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-0 after:bg-teal-300 hover:text-teal-500 after:transition-all after:duration-300 hover:after:w-full"
+              >
+                Dashboard
+              </Link>
+
+              <Link
                 href="/upload"
                 className="relative text-black after:content-[''] after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-0 after:bg-teal-300 hover:text-teal-500 after:transition-all after:duration-300 hover:after:w-full"
               >
                 Upload
               </Link>
 
-              <Link
-                href="/dashboard"
-                className="relative text-black after:content-[''] after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-0 after:bg-teal-300 hover:text-teal-500 after:transition-all after:duration-300 hover:after:w-full"
-              >
-                Dashboard
-              </Link>
 
               <Link
                 href="/history"
@@ -121,7 +122,7 @@ export default function Navbar() {
             <div className="hidden md:block relative" ref={dropdownRef}>
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
-                className={`w-10 h-10 rounded-full font-bold flex items-center justify-center transition ${isAuthenticated
+                className={`w-10 h-10 rounded-full font-bold flex items-center cursor-pointer justify-center transition ${isAuthenticated
                   ? "bg-teal-600 text-white hover:bg-teal-700"
                   : "bg-gray-300 text-gray-700 hover:bg-gray-400"
                   }`}
