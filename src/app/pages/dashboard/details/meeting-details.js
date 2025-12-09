@@ -169,7 +169,7 @@ const MeetingDetailsPage = ({ meetingId }) => {
             const modelFlash = base + 'gemini-2.0-flash:generateContent?key=' + apiKey
             const modelPro = base + 'gemini-2.0-pro:generateContent?key=' + apiKey
 
-            let res = await fetch(modelFlash, {
+            let res = await fetch(modelFlash, { 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
