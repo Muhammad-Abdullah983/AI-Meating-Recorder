@@ -67,6 +67,8 @@ const DashboardMetrics = () => {
     todayCount: 0,
     weekChange: 0,
     completedRate: 0,
+    totalChange: 0,
+    todayChange: 0,
   })
   const [isLoading, setIsLoading] = useState(true)
   const hasFetched = useRef(false)
@@ -88,7 +90,7 @@ const DashboardMetrics = () => {
       // Fetch all meetings for this user
       const { data: allMeetings, error: allError } = await supabase
         .from('meetings')
-        .select('id, status, created_at')
+        .select('id, status, created_at, transcript')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
@@ -141,14 +143,25 @@ const DashboardMetrics = () => {
         ? Math.round(((weekMeetings.length - prevWeekMeetings.length) / prevWeekMeetings.length) * 100)
         : 0
 
+      // Calculate today's change (percentage of today's meetings relative to daily average)
+      const daysSinceFirstMeeting = allMeetings && allMeetings.length > 0
+        ? Math.max(1, Math.ceil((Date.now() - new Date(allMeetings[allMeetings.length - 1].created_at).getTime()) / (1000 * 60 * 60 * 24)))
+        : 1
+      const dailyAverage = allMeetings ? allMeetings.length / daysSinceFirstMeeting : 0
+      const todayChange = dailyAverage > 0 && todayMeetings
+        ? Math.round(((todayMeetings.length - dailyAverage) / dailyAverage) * 100)
+        : 0
+
       setMetrics({
-        totalMeetings: allMeetings.length,
-        thisWeek: weekMeetings.length,
-        completedCount: completedMeetings.length,
-        withTranscripts: withTranscriptsMeetings.length,
-        todayCount: todayMeetings.length,
-        weekChange: weekChange,
-        completedRate: completedRate,
+        totalMeetings: allMeetings?.length || 0,
+        thisWeek: weekMeetings?.length || 0,
+        completedCount: completedMeetings?.length || 0,
+        withTranscripts: withTranscriptsMeetings?.length || 0,
+        todayCount: todayMeetings?.length || 0,
+        weekChange: weekChange || 0,
+        completedRate: completedRate || 0,
+        totalChange: allMeetings && allMeetings.length > 0 ? 100 : 0,
+        todayChange: todayChange || 0,
       })
     } catch (error) {
       console.error('Error fetching metrics:', error)
@@ -163,7 +176,7 @@ const DashboardMetrics = () => {
       icon: FileText,
       title: 'Total Meetings',
       value: metrics.totalMeetings,
-      change: metrics.weekChange,
+      change: metrics.totalChange || 0,
     },
     {
       id: 2,
@@ -172,12 +185,12 @@ const DashboardMetrics = () => {
       value: metrics.thisWeek,
       change: metrics.weekChange,
     },
-       {
+    {
       id: 4,
       icon: Clock,
       title: 'Today',
       value: metrics.todayCount,
-      change: 0,
+      change: metrics.todayChange,
     },
     {
       id: 3,
@@ -186,7 +199,7 @@ const DashboardMetrics = () => {
       value: metrics.completedCount,
       change: metrics.completedRate,
     },
- 
+
   ]
 
   return (
