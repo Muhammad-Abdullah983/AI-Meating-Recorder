@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
+import { FaSpinner } from "react-icons/fa6";
+
 
 export default function DashboardWrapper({ children }) {
     const router = useRouter();
@@ -25,8 +27,11 @@ export default function DashboardWrapper({ children }) {
     // Show loading while checking auth status
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-black">
-                <div className="text-white text-xl">Loading...</div>
+            <div className="max-w-6xl mx-auto px-5 py-5 bg-gray-50 min-h-screen flex items-center justify-center">
+                <div className="text-lg text-gray-600">
+                    <FaSpinner className='w-8 h-8 animate-spin text-teal-600' />
+
+                </div>
             </div>
         );
     }

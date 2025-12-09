@@ -1,14 +1,15 @@
 import React from 'react';
+import Link from 'next/link';
 // Assuming these Lucide icons are available in your Next.js environment
-import { UploadCloud, Code, Zap, CheckCircle, Users, Lock } from 'lucide-react';
+import { UploadCloud, Code, Zap, CheckCircle, Users, Lock, Link as LinkIcon } from 'lucide-react';
 
 /**
  * Reusable component for a single feature card.
  * It implements the styling from the image: rounded corners, light border,
  * and a prominent icon area.
  */
-const FeatureBox = ({ icon: Icon, title, description }) => {
-    return (
+const FeatureBox = ({ icon: Icon, title, description, link }) => {
+    const content = (
         <div className="
       
       p-6 md:p-8
@@ -49,6 +50,14 @@ const FeatureBox = ({ icon: Icon, title, description }) => {
             </p>
         </div>
     );
+
+    // If link is provided, wrap in Link component
+    if (link) {
+        return <Link href={link}>{content}</Link>;
+    }
+
+    // Otherwise return the content without a link
+    return content;
 };
 
 
@@ -124,13 +133,14 @@ const CallToAction = () => {
 
 
 const Aboutmeetings = () => {
-  
+
     const features = [
         {
             id: 1,
             icon: UploadCloud, // Corresponds to the icon in the image
             title: 'Easy Upload',
             description: 'Drag and drop your meeting recordings. Supports audio and video formats.',
+            link: '/upload',
         },
         {
             id: 2,
@@ -192,6 +202,7 @@ const Aboutmeetings = () => {
                             icon={feature.icon}
                             title={feature.title}
                             description={feature.description}
+                            link={feature.link}
                         />
                     ))}
                 </div>

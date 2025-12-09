@@ -65,6 +65,14 @@ export default function VerifyForm() {
   // Handle OTP verification
   async function onSubmit(data) {
     setError("");
+
+    // Check if timer expired
+    if (timeLeft <= 0) {
+      setError("OTP has expired. Please request a new code.");
+      toast.error("OTP has expired. Please request a new code.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -187,7 +195,7 @@ export default function VerifyForm() {
           <h2 className="text-3xl text-center font-bold text-gray-900 mb-2">Verify Email</h2>
           <p className="text-gray-600 text-center text-sm mb-6">Enter the 6-digit code we sent to your email</p>
 
-        
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* OTP Input */}
             <FormInput
@@ -210,9 +218,9 @@ export default function VerifyForm() {
             <button
               type="submit"
               className="w-full bg-linear-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-semibold p-3 rounded-lg transition transform hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
-              disabled={loading || isSubmitting}
+              disabled={loading || isSubmitting || timeLeft <= 0}
             >
-              {loading || isSubmitting ? "Verifying..." : "Verify"}
+              {loading || isSubmitting ? "Verifying..." : timeLeft <= 0 ? "Code Expired" : "Verify"}
             </button>
 
             {/* Timer Display - Below Verify Button */}
