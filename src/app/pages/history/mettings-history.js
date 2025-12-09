@@ -271,7 +271,7 @@ const MeetingHistory = () => {
 
             {/* Delete Confirmation Modal */}
             {deleteConfirm && (
-                <div className="fixed inset-0 bg-transparent bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+                <div className="fixed inset-0 bg-transparent bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-[2px]">
                     <div className="bg-white rounded-lg shadow-xl p-6 max-w-sm">
                         <h3 className="text-lg font-bold text-gray-900 mb-2">
                             {deleteConfirm === 'selected' ? 'Delete Selected Meetings?' : 'Delete Meeting?'}

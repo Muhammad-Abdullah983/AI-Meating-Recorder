@@ -269,7 +269,7 @@ const MeetingDetailsPage = ({ meetingId }) => {
                                     type="text"
                                     value={tempName}
                                     onChange={(e) => setTempName(e.target.value)}
-                                    className="flex-1 md:text-4xl text-xl font-bold text-gray-900 bg-transparent border-b-2 border-gray-300 focus:outline-none focus:border-teal-600 px-2 py-1"
+                                    className="flex-1 md:text-3xl text-xl font-semibold text-gray-900 bg-transparent border-b-2 border-gray-300 focus:outline-none focus:border-teal-600 px-2 py-1"
                                 />
                                 <div className="flex gap-2 shrink-0">
                                     <button

@@ -39,7 +39,7 @@ const MetricCard = ({ icon: Icon, title, value, change, isLoading }) => {
         <div className="
           w-10 h-10 p-2
           bg-indigo-50
-          text-indigo-600
+          text-teal-600
           rounded-lg
           flex items-center justify-center hidden md:flex
         ">
