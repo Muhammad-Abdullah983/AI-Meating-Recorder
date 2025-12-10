@@ -135,7 +135,7 @@ export default function LoginForm() {
               {/* Login Button */}
               <button
                 type="submit"
-                className="w-full bg-linear-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-semibold p-3 rounded-lg transition transform hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
+                className="w-full bg-linear-to-r from-teal-600 cursor-pointer to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-semibold p-3 rounded-lg transition transform hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
                 disabled={loading || isSubmitting}
               >
                 {loading || isSubmitting ? "Logging in..." : "Login"}

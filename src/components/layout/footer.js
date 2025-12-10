@@ -24,7 +24,8 @@ export default function Footer() {
 
                     <div className="col-span-1">
 
-                        <Link href="/" className="flex items-center space-x-2 mb-4 hover:cursor-pointer transition-opacity">
+                        {/* <Link href="/" className="flex items-center space-x-2 mb-4 hover:cursor-pointer transition-opacity"> */}
+                        <div className="flex items-center mb-4 space-x-3">
 
                             <div className="flex items-center justify-center w-10 h-10 bg-teal-600 rounded-lg shadow-md">
                                 <svg
@@ -39,7 +40,8 @@ export default function Footer() {
                                 <span className="text-xl md:text-2xl font-extrabold text-teal-600">MeetingAI</span>
                                 <span className="text-sm text-gray-500">Intelligent Meeting Insights</span>
                             </div>
-                        </Link>
+                        </div>
+                        {/* </Link> */}
                         <p className="text-sm text-gray-400 ">
                             Transform your meetings into actionable insights with AI-powered analysis and summaries.
                         </p>
@@ -60,12 +62,12 @@ export default function Footer() {
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#features" className="text-sm hover:text-teal-400 transition">
+                                <Link href="#" className="text-sm hover:text-teal-400 transition">
                                     Features
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#pricing" className="text-sm hover:text-teal-400 transition">
+                                <Link href="#" className="text-sm hover:text-teal-400 transition">
                                     Pricing
                                 </Link>
                             </li>
@@ -77,22 +79,22 @@ export default function Footer() {
                         <h3 className="text-white text-xl font-semibold mb-4">Resources</h3>
                         <ul className="space-y-2">
                             <li>
-                                <Link href="#docs" className="text-sm hover:text-teal-400 transition">
+                                <Link href="#" className="text-sm hover:text-teal-400 transition">
                                     Documentation
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#faq" className="text-sm hover:text-teal-400 transition">
+                                <Link href="#" className="text-sm hover:text-teal-400 transition">
                                     FAQ
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#blog" className="text-sm hover:text-teal-400 transition">
+                                <Link href="#" className="text-sm hover:text-teal-400 transition">
                                     Blog
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#support" className="text-sm hover:text-teal-400 transition">
+                                <Link href="#" className="text-sm hover:text-teal-400 transition">
                                     Support
                                 </Link>
                             </li>
@@ -109,17 +111,17 @@ export default function Footer() {
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#privacy" className="text-sm hover:text-teal-400 transition">
+                                <Link href="#" className="text-sm hover:text-teal-400 transition">
                                     Privacy Policy
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#terms" className="text-sm hover:text-teal-400 transition">
+                                <Link href="#" className="text-sm hover:text-teal-400 transition">
                                     Terms of Service
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#contact" className="text-sm hover:text-teal-400 transition">
+                                <Link href="#" className="text-sm hover:text-teal-400 transition">
                                     Contact
                                 </Link>
                             </li>

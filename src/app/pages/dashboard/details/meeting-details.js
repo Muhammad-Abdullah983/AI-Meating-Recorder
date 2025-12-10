@@ -259,13 +259,13 @@ const MeetingDetailsPage = ({ meetingId }) => {
                                 <div className="flex gap-2 shrink-0">
                                     <button
                                         onClick={saveEditName}
-                                        className="px-4 py-2 bg-teal-600 text-white rounded-md text-sm font-medium hover:bg-teal-700 whitespace-nowrap"
+                                        className="px-4 py-2 bg-teal-600 cursor-pointer text-white rounded-md text-sm font-medium hover:bg-teal-700 whitespace-nowrap"
                                     >
                                         Save
                                     </button>
                                     <button
                                         onClick={cancelEditName}
-                                        className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md text-sm font-medium hover:bg-gray-300 whitespace-nowrap"
+                                        className="px-4 py-2 bg-gray-200 cursor-poin text-gray-800 rounded-md text-sm font-medium hover:bg-gray-300 whitespace-nowrap"
                                     >
                                         Cancel
                                     </button>
@@ -280,7 +280,7 @@ const MeetingDetailsPage = ({ meetingId }) => {
                                     title="Edit meeting name"
                                     className="p-2 rounded-md border border-gray-200 text-teal-700 hover:bg-teal-100 hover:text-teal-900 shrink-0"
                                 >
-                                    <Edit className="w-4 h-4" />
+                                    <Edit className="w-4  h-4 cursor-pointer" />
                                 </button>
                             </>
                         )}

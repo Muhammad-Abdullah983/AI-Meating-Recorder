@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { profileSchema, passwordSchema } from '@/lib/validationSchemas';
 import FormInput from '@/components/ui/FormInput';
 import FormTextarea from '@/components/ui/FormTextarea';
+import toast from 'react-hot-toast';
 
 // Custom verified badge icon (blue filled with white check)
 const VerifiedBadge = ({ className = "w-5 h-5" }) => (
@@ -116,12 +117,12 @@ const ProfilePage = () => {
         if (file) {
             // Validate file type
             if (!file.type.startsWith('image/')) {
-                setMessage('Please select a valid image file');
+                toast.error('Please select a valid image file');
                 return;
             }
             // Validate file size (max 5MB)
             if (file.size > 5 * 1024 * 1024) {
-                setMessage('Image size must be less than 5MB');
+                toast.error('Image size must be less than 5MB');
                 return;
             }
 
@@ -148,10 +149,9 @@ const ProfilePage = () => {
             // Simulate API call
             await new Promise(resolve => setTimeout(resolve, 1000));
             setProfilePicture(previewPicture);
-            setMessage('Profile updated successfully!');
-            setTimeout(() => setMessage(''), 3000);
+            toast.success('Profile updated successfully!');
         } catch (error) {
-            setMessage('Error saving profile. Please try again.');
+            toast.error('Error saving profile. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -166,7 +166,7 @@ const ProfilePage = () => {
             if (data.currentPassword) {
                 const email = user?.email || profile.email;
                 if (!email) {
-                    setMessage('Missing email for re-authentication.');
+                    toast.error('Missing email for re-authentication.');
                     return;
                 }
                 const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -174,22 +174,21 @@ const ProfilePage = () => {
                     password: data.currentPassword,
                 });
                 if (signInError) {
-                    setMessage('Current password is incorrect.');
+                    toast.error('Current password is incorrect.');
                     return;
                 }
             }
 
             const { error } = await supabase.auth.updateUser({ password: data.newPassword });
             if (error) {
-                setMessage(error.message || 'Failed to update password.');
+                toast.error(error.message || 'Failed to update password.');
                 return;
             }
 
-            setMessage('Password updated successfully!');
+            toast.success('Password updated successfully!');
             resetPassword();
-            setTimeout(() => setMessage(''), 3000);
         } catch (err) {
-            setMessage('Error updating password. Please try again.');
+            toast.error('Error updating password. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -212,7 +211,7 @@ const ProfilePage = () => {
                                 onClick={() => fileInputRef.current?.click()}
                                 className="absolute bottom-3 -right-1 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition"
                             >
-                                <Camera className="w-5 h-5 text-teal-600" />
+                                <Camera className="w-5 h-5 cursor-pointer text-teal-600" />
                             </button>
                         </div>
                         <div className="flex-1 pl-2 mt-12 pt-10 text-black">
@@ -244,13 +243,13 @@ const ProfilePage = () => {
                     <div className="border-b px-6 pt-4">
                         <div className="flex gap-6 ">
                             <button
-                                className={`py-3 font-semibold ${activeTab === 'profile' ? 'text-teal-700 border-b-2 border-teal-700' : 'text-gray-600'}`}
+                                className={`py-3 cursor-pointer font-semibold ${activeTab === 'profile' ? 'text-teal-700 border-b-2 border-teal-700' : 'text-gray-600'}`}
                                 onClick={() => setActiveTab('profile')}
                             >
                                 Profile
                             </button>
                             <button
-                                className={`py-3 font-semibold ${activeTab === 'password' ? 'text-teal-700 border-b-2 border-teal-700' : 'text-gray-600'}`}
+                                className={`py-3 cursor-pointer font-semibold ${activeTab === 'password' ? 'text-teal-700 border-b-2 border-teal-700' : 'text-gray-600'}`}
                                 onClick={() => setActiveTab('password')}
                             >
                                 Password
@@ -355,7 +354,7 @@ const ProfilePage = () => {
                                     <button
                                         type="button"
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg shadow-md hover:bg-gray-300 transition flex items-center gap-2"
+                                        className="px-6 py-3 bg-gray-200 text-gray-700 cursor-pointer rounded-lg shadow-md hover:bg-gray-300 transition flex items-center gap-2"
                                     >
                                         <UploadIcon className="w-5 h-5" />
                                         Change Picture
@@ -363,7 +362,7 @@ const ProfilePage = () => {
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="px-6 py-3 bg-teal-600 text-white rounded-lg shadow-md hover:bg-teal-700 transition disabled:opacity-50"
+                                        className="px-6 py-3 bg-teal-600 text-white cursor-pointer rounded-lg shadow-md hover:bg-teal-700 transition disabled:opacity-50"
                                     >
                                         {loading ? 'Saving...' : 'Save Changes'}
                                     </button>
@@ -428,7 +427,7 @@ const ProfilePage = () => {
                                     <button
                                         type="submit"
                                         disabled={loading || isPasswordSubmitting}
-                                        className="px-6 py-3 bg-teal-600 text-white rounded-lg shadow-md hover:bg-teal-700 disabled:opacity-50"
+                                        className="px-6 py-3 bg-teal-600 text-white cursor-pointer rounded-lg shadow-md hover:bg-teal-700 disabled:opacity-50"
                                     >
                                         {loading || isPasswordSubmitting ? 'Updating...' : 'Update Password'}
                                     </button>

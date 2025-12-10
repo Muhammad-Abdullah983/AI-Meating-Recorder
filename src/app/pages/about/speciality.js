@@ -20,7 +20,7 @@ const FeatureCard = ({ icon: Icon, title, description }) => {
             <div
                 className="
           w-12 h-12 p-2 mb-4
-          bg-teal-200
+          bg-gray-100
           text-teal-800
           rounded-xl
           flex items-center justify-center

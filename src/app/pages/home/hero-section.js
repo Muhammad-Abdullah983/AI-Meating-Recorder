@@ -1,4 +1,5 @@
 
+import Link from 'next/link';
 import React from 'react';
 
 
@@ -30,22 +31,22 @@ const HeroSection = () => {
                 <div className="flex justify-center space-x-4">
 
                     {/* Primary Button */}
-                    <a href="/dashboard">
+                    <Link href="/dashboard">
 
 
                         <button className="flex items-center cursor-pointer justify-center px-4 py-4 md:px-8 md:py-4 text-sm md:text-base font-semibold text-white bg-teal-600 rounded-lg shadow-md hover:bg-teal-700 transition duration-150 ease-in-out"
                         >
                             View Dashboard →
                         </button>
-                    </a>
+                    </Link>
 
                     {/* Secondary Button */}
-                    <a
+                    <Link
                         href="/upload"
                         className="flex items-center cursor-pointer justify-center px-4 py-4 md:px-8 md:py-4 text-sm md:text-base font-semibold text-gray-700 bg-white rounded-lg border border-gray-300 shadow-sm hover:bg-gray-50 transition duration-150 ease-in-out"
                     >
                       Upload Recording
-                    </a>
+                    </Link>
                 </div>
                 <div className=" flex justify-between gap-4 p-6 pt-14 sm:mt-16">
 

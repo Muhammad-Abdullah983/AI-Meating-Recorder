@@ -158,7 +158,7 @@ export default function Navbar() {
               {/* Mobile Menu Toggle - Only visible below md */}
               <button
                 onClick={() => setShowSidebar(!showSidebar)}
-                className="md:hidden  rounded-lg hover:bg-gray-100 transition"
+                className="md:hidden  rounded-lg cursor-pointer transition"
               >
                 {showSidebar ? (
                   <X className="w-6 h-6 text-gray-700" />
@@ -230,6 +230,13 @@ export default function Navbar() {
 
             {/* Sidebar Navigation */}
             <div className="p-4 space-y-2">
+                 <Link
+                href="/dashboard"
+                onClick={() => setShowSidebar(false)}
+                className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-teal-50 transition"
+              >
+                Dashboard
+              </Link>
               <Link
                 href="/upload"
                 onClick={() => setShowSidebar(false)}
@@ -237,13 +244,7 @@ export default function Navbar() {
               >
                 Upload
               </Link>
-              <Link
-                href="/dashboard"
-                onClick={() => setShowSidebar(false)}
-                className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-teal-50 transition"
-              >
-                Dashboard
-              </Link>
+           
               <Link
                 href="/history"
                 onClick={() => setShowSidebar(false)}
@@ -258,18 +259,21 @@ export default function Navbar() {
               >
                 About
               </Link>
-            </div>
-
-            {/* Sidebar Footer */}
-            <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 space-y-2">
               <Link
                 href="/profile"
                 onClick={() => setShowSidebar(false)}
                 className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-teal-50 transition"
               >
-                <p className="text-sm font-medium">{userName}</p>
-                <p className="text-xs text-gray-500">{userEmail}</p>
+                My Profile
               </Link>
+            </div>
+
+            {/* Sidebar Footer */}
+            <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 space-y-2">
+             
+                <p className="text-sm text-gray-700 font-medium">{userName}</p>
+                <p className="text-xs text-gray-700">{userEmail}</p>
+              
               <button
                 onClick={() => {
                   setShowSidebar(false);

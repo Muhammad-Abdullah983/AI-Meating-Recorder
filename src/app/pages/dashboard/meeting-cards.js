@@ -130,8 +130,8 @@ const MeetingCards = ({ searchQuery = '' }) => {
                         key={meeting.id}
                         onMouseEnter={() => setHoveredCard(meeting.id)}
                         onMouseLeave={() => setHoveredCard(null)}
-                        onClick={() => router.push(`/details/${meeting.id}`)}
-                        className={`group rounded-xl border-2 transition-all duration-300 overflow-hidden cursor-pointer transform hover:scale-100 hover:shadow-2xl ${getStatusColor(meeting.status)}`}
+                        // onClick={() => router.push(`/details/${meeting.id}`)}
+                        className={`group rounded-xl border-2 transition-all duration-300 overflow-hidden transform hover:scale-100 hover:shadow-2xl ${getStatusColor(meeting.status)}`}
                     >
                         {/* Card Content */}
                         <div className="p-6">
