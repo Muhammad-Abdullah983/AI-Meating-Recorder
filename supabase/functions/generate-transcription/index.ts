@@ -28,11 +28,11 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
 )
 
-// Google Gemini configuration
-const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') 
-const GEMINI_MODELS = {
-  transcription: 'gemini-2.0-flash', // Used for file transcription
-  analysis: 'gemini-2.0-flash', // Used for summary and insights
+// Groq API configuration
+const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY')
+const GROQ_MODELS = {
+  transcription: 'whisper-large-v3', // Groq's Whisper model for transcription
+  analysis: 'llama-3.3-70b-versatile', // Groq's LLaMA model for analysis
 }
 
 async function downloadFileFromStorage(filePath: string): Promise<Uint8Array> {
@@ -53,12 +53,12 @@ async function downloadFileFromStorage(filePath: string): Promise<Uint8Array> {
   return buffer
 }
 
-async function getTranscriptionFromGemini(
+async function getTranscriptionFromGroq(
   fileBuffer: Uint8Array,
   fileName: string
 ): Promise<string> {
-  console.log(`[GEMINI-TRANSCRIPTION] Starting transcription request for file: ${fileName}`)
-  console.log(`[GEMINI-TRANSCRIPTION] File size: ${fileBuffer.length} bytes`)
+  console.log(`[GROQ-TRANSCRIPTION] Starting transcription request for file: ${fileName}`)
+  console.log(`[GROQ-TRANSCRIPTION] File size: ${fileBuffer.length} bytes`)
   
   // Determine MIME type based on file extension
   const extension = fileName.split('.').pop()?.toLowerCase() || ''
@@ -72,67 +72,46 @@ async function getTranscriptionFromGemini(
     'mov': 'video/quicktime',
   }
   const mimeType = mimeTypes[extension] || 'audio/mpeg'
-  console.log(`[GEMINI-TRANSCRIPTION] Detected MIME type: ${mimeType}`)
+  console.log(`[GROQ-TRANSCRIPTION] Detected MIME type: ${mimeType}`)
 
-  console.log(`[GEMINI-TRANSCRIPTION] Sending request to Gemini API...`)
+  console.log(`[GROQ-TRANSCRIPTION] Sending request to Groq Whisper API...`)
   const startTime = Date.now()
   
-  // Convert buffer to base64 safely (avoid call stack exceeded for large files)
-  let base64Data = ''
-  const chunkSize = 8192
-  for (let i = 0; i < fileBuffer.length; i += chunkSize) {
-    const chunk = fileBuffer.subarray(i, Math.min(i + chunkSize, fileBuffer.length))
-    base64Data += String.fromCharCode.apply(null, Array.from(chunk) as any)
-  }
-  base64Data = btoa(base64Data)
+  // Create form data for Groq Whisper API
+  const formData = new FormData()
+  const blob = new Blob([fileBuffer], { type: mimeType })
+  formData.append('file', blob, fileName)
+  formData.append('model', GROQ_MODELS.transcription)
+  formData.append('response_format', 'text')
   
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+    'https://api.groq.com/openai/v1/audio/transcriptions',
     {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
       },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: 'Please transcribe this audio/video file accurately. Provide only the transcribed text.',
-              },
-              {
-                inlineData: {
-                  mimeType: mimeType,
-                  data: base64Data,
-                },
-              },
-            ],
-          },
-        ],
-      }),
+      body: formData,
     }
   )
 
   const duration = Date.now() - startTime
-  console.log(`[GEMINI-TRANSCRIPTION] Response received in ${duration}ms. Status: ${response.status}`)
+  console.log(`[GROQ-TRANSCRIPTION] Response received in ${duration}ms. Status: ${response.status}`)
 
   if (!response.ok) {
-    const error = await response.json()
-    console.error(`[GEMINI-TRANSCRIPTION] Error Response:`, JSON.stringify(error, null, 2))
-    throw new Error(`Gemini transcription error: ${error.error?.message || 'Unknown error'}`)
+    const errorText = await response.text()
+    console.error(`[GROQ-TRANSCRIPTION] Error Response:`, errorText)
+    throw new Error(`Groq transcription error: ${errorText}`)
   }
 
-  const result = await response.json()
-  console.log(`[GEMINI-TRANSCRIPTION] Response received successfully`)
-  
-  // Extract text from Gemini response
-  const transcriptionText = result.candidates?.[0]?.content?.parts?.[0]?.text || ''
+  const transcriptionText = await response.text()
+  console.log(`[GROQ-TRANSCRIPTION] Response received successfully`)
   
   if (!transcriptionText) {
-    throw new Error('No transcription text received from Gemini API')
+    throw new Error('No transcription text received from Groq API')
   }
   
-  console.log(`[GEMINI-TRANSCRIPTION] Transcription successful. Text length: ${transcriptionText.length} characters`)
+  console.log(`[GROQ-TRANSCRIPTION] Transcription successful. Text length: ${transcriptionText.length} characters`)
   
   return transcriptionText
 }
@@ -146,9 +125,9 @@ async function generateSummaryAndInsights(
   actionItems: string[]
   participants: Array<{ name: string; email?: string }>
 }> {
-  console.log(`[GEMINI-ANALYSIS] Starting summary and insights generation`)
-  console.log(`[GEMINI-ANALYSIS] Transcription text length: ${transcription.length} characters`)
-  console.log(`[GEMINI-ANALYSIS] First 200 characters: ${transcription.substring(0, 200)}...`)
+  console.log(`[GROQ-ANALYSIS] Starting summary and insights generation`)
+  console.log(`[GROQ-ANALYSIS] Transcription text length: ${transcription.length} characters`)
+  console.log(`[GROQ-ANALYSIS] First 200 characters: ${transcription.substring(0, 200)}...`)
   
   const analysisPrompt = `Analyze this meeting transcript and respond with ONLY valid JSON (no markdown, no extra text, no code blocks).
 
@@ -169,51 +148,46 @@ Respond with this exact JSON structure:
 
 IMPORTANT: Return ONLY the JSON object. No markdown code blocks, no extra text, no explanations. Start with { and end with }.`
 
-  console.log(`[GEMINI-ANALYSIS] Sending request to Gemini API...`)
+  console.log(`[GROQ-ANALYSIS] Sending request to Groq API...`)
   const startTime = Date.now()
   
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+    'https://api.groq.com/openai/v1/chat/completions',
     {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-        contents: [
+        model: GROQ_MODELS.analysis,
+        messages: [
           {
-            parts: [
-              {
-                text: analysisPrompt,
-              },
-            ],
+            role: 'user',
+            content: analysisPrompt,
           },
         ],
-        generationConfig: {
-          temperature: 0.3,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 1024,
-        },
+        temperature: 0.3,
+        max_tokens: 1024,
       }),
     }
   )
 
   const duration = Date.now() - startTime
-  console.log(`[GEMINI-ANALYSIS] Response received in ${duration}ms. Status: ${response.status}`)
+  console.log(`[GROQ-ANALYSIS] Response received in ${duration}ms. Status: ${response.status}`)
 
   if (!response.ok) {
     const error = await response.json()
-    console.error(`[GEMINI-ANALYSIS] Error Response:`, JSON.stringify(error, null, 2))
-    throw new Error(`Gemini analysis error: ${error.error?.message || 'Unknown error'}`)
+    console.error(`[GROQ-ANALYSIS] Error Response:`, JSON.stringify(error, null, 2))
+    throw new Error(`Groq analysis error: ${error.error?.message || 'Unknown error'}`)
   }
 
   const result = await response.json()
-  console.log(`[GEMINI-ANALYSIS] Response received successfully`)
+  console.log(`[GROQ-ANALYSIS] Response received successfully`)
   
-  let content = result.candidates?.[0]?.content?.parts?.[0]?.text || ''
-  console.log(`[GEMINI-ANALYSIS] Content length: ${content.length} characters`)
-  console.log(`[GEMINI-ANALYSIS] First 300 characters of response: ${content.substring(0, 300)}...`)
+  let content = result.choices?.[0]?.message?.content || ''
+  console.log(`[GROQ-ANALYSIS] Content length: ${content.length} characters`)
+  console.log(`[GROQ-ANALYSIS] First 300 characters of response: ${content.substring(0, 300)}...`)
 
   // Clean up the response - remove markdown code blocks if present
   content = content.trim()
@@ -224,14 +198,14 @@ IMPORTANT: Return ONLY the JSON object. No markdown code blocks, no extra text, 
   }
   content = content.trim()
 
-  console.log(`[GEMINI-ANALYSIS] Cleaned content for parsing: ${content.substring(0, 200)}...`)
+  console.log(`[GROQ-ANALYSIS] Cleaned content for parsing: ${content.substring(0, 200)}...`)
 
   try {
     const parsed = JSON.parse(content)
-    console.log(`[GEMINI-ANALYSIS] JSON parsed successfully`)
-    console.log(`[GEMINI-ANALYSIS] Summary length: ${parsed.summary?.length || 0} characters`)
-    console.log(`[GEMINI-ANALYSIS] Key points count: ${(parsed.keyPoints || []).length}`)
-    console.log(`[GEMINI-ANALYSIS] Action items count: ${(parsed.actionItems || []).length}`)
+    console.log(`[GROQ-ANALYSIS] JSON parsed successfully`)
+    console.log(`[GROQ-ANALYSIS] Summary length: ${parsed.summary?.length || 0} characters`)
+    console.log(`[GROQ-ANALYSIS] Key points count: ${(parsed.keyPoints || []).length}`)
+    console.log(`[GROQ-ANALYSIS] Action items count: ${(parsed.actionItems || []).length}`)
     
     const participants: Array<{ name: string; email?: string }> = Array.isArray(parsed.participants)
       ? parsed.participants
@@ -246,8 +220,8 @@ IMPORTANT: Return ONLY the JSON object. No markdown code blocks, no extra text, 
       participants,
     }
   } catch (parseError) {
-    console.error(`[GEMINI-ANALYSIS] JSON parsing failed:`, parseError)
-    console.error(`[GEMINI-ANALYSIS] Raw content that failed to parse:`, content)
+    console.error(`[GROQ-ANALYSIS] JSON parsing failed:`, parseError)
+    console.error(`[GROQ-ANALYSIS] Raw content that failed to parse:`, content)
     
     // Fallback: return default values instead of throwing
     return {
@@ -380,13 +354,13 @@ Deno.serve(async (req: Request): Promise<Response> => {
     }
 
     // Check Gemini API key
-    if (!GEMINI_API_KEY) {
-      console.error('[CONFIG] Gemini API key not configured')
-      return new Response(
-        JSON.stringify({ error: 'Gemini API key not configured' }),
-        { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-      )
-    }
+    // if (!GEMINI_API_KEY) {
+    //   console.error('[CONFIG] Gemini API key not configured')
+    //   return new Response(
+    //     JSON.stringify({ error: 'Gemini API key not configured' }),
+    //     { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+    //   )
+    // }
     console.log('[CONFIG] Gemini API key is configured')
 
     console.log(`\n[PROCESSING] Starting transcription process for file: ${fileName}`)
@@ -405,12 +379,12 @@ Deno.serve(async (req: Request): Promise<Response> => {
     console.log('\n[STEP 1/4] Downloading file from Supabase Storage...')
     const fileBuffer = await downloadFileFromStorage(filePath)
 
-    // Step 2: Get transcription from Gemini
-    console.log('\n[STEP 2/4] Sending file to Gemini for transcription...')
-    const transcription = await getTranscriptionFromGemini(fileBuffer, fileName)
+    // Step 2: Get transcription from Groq Whisper
+    console.log('\n[STEP 2/4] Sending file to Groq Whisper for transcription...')
+    const transcription = await getTranscriptionFromGroq(fileBuffer, fileName)
 
-    // Step 3: Generate summary and insights using Gemini
-    console.log('\n[STEP 3/4] Generating summary and insights with Gemini...')
+    // Step 3: Generate summary and insights using Groq LLaMA
+    console.log('\n[STEP 3/4] Generating summary and insights with Groq...')
     const { summary, keyPoints, actionItems, participants } = await generateSummaryAndInsights(transcription)
 
     // Step 4: Update meeting record in database

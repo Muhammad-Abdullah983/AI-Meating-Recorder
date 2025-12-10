@@ -152,59 +152,44 @@ const MeetingDetailsPage = ({ meetingId }) => {
             `User Question: """${question}"""\n\n` +
             `Instructions: Ground answers in transcript and summary. Use bullets. Bold labels like Decision:. Keep under 8–12 lines unless asked. Do not invent facts.`
 
-        const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY
+        const groqApiKey = process.env.NEXT_PUBLIC_GROQ_API_KEY
 
         try {
-            if (!apiKey) throw new Error('Missing NEXT_PUBLIC_GEMINI_API_KEY')
+            if (!groqApiKey) throw new Error('Missing NEXT_PUBLIC_GROQ_API_KEY')
 
-            console.log('[AI Chat] Sending prompt to Gemini...', {
+            console.log('[AI Chat] Sending prompt to Groq...', {
                 meetingId: data.id,
                 hasTranscript: Boolean(data.transcript && data.transcript.length > 0),
                 promptChars: prompt.length
             })
 
-            // Use a stable, supported model name for v1beta
-            const base = 'https://generativelanguage.googleapis.com/v1beta/models/'
-            // Align with edge function usage: gemini-2.0-flash
-            const modelFlash = base + 'gemini-2.0-flash:generateContent?key=' + apiKey
-            const modelPro = base + 'gemini-2.0-pro:generateContent?key=' + apiKey
-
-            let res = await fetch(modelFlash, { 
+            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${groqApiKey}`,
+                },
                 body: JSON.stringify({
-                    contents: [
+                    model: 'llama-3.3-70b-versatile',
+                    messages: [
                         {
                             role: 'user',
-                            parts: [{ text: prompt }]
-                        }
-                    ]
-                })
+                            content: prompt,
+                        },
+                    ],
+                    temperature: 0.3,
+                    max_tokens: 1024,
+                }),
             })
-            // If flash is not found, retry with pro once
-            if (res.status === 404) {
-                console.warn('[AI Chat] flash model 404; retrying with pro')
-                res = await fetch(modelPro, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [
-                            {
-                                role: 'user',
-                                parts: [{ text: prompt }]
-                            }
-                        ]
-                    })
-                })
+
+            if (!response.ok) {
+                const errText = await response.text()
+                throw new Error(errText || `Failed to get AI response (status ${response.status})`)
             }
 
-            if (!res.ok) {
-                const errText = await res.text()
-                throw new Error(errText || `Failed to get AI response (status ${res.status})`)
-            }
-            const payload = await res.json()
-            console.log('[AI Chat] Gemini response received', payload)
-            const answer = payload?.candidates?.[0]?.content?.parts?.[0]?.text || 'No answer generated.'
+            const payload = await response.json()
+            console.log('[AI Chat] Groq response received', payload)
+            const answer = payload?.choices?.[0]?.message?.content || 'No answer generated.'
 
             const aiMessage = {
                 id: Date.now() + 1,
@@ -215,8 +200,8 @@ const MeetingDetailsPage = ({ meetingId }) => {
             setMessages(prev => [...prev, aiMessage]);
         } catch (error) {
             console.error('AI chat error:', error)
-            const friendly = !apiKey
-                ? 'Missing API key. Please set NEXT_PUBLIC_GEMINI_API_KEY in .env.local and restart.'
+            const friendly = !groqApiKey
+                ? 'Missing API key. Please set NEXT_PUBLIC_GROQ_API_KEY in .env and restart.'
                 : 'Sorry, I could not process that right now. Please try again shortly.'
             const aiMessage = {
                 id: Date.now() + 1,
