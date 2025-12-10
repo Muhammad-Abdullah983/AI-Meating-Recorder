@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -141,13 +142,13 @@ export default function SignupForm() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex pt-6 items-start md:items-center justify-center px-4 overflow-y-auto">
-
-      <div className="w-full max-w-2xl md:max-w-[50%] py-8 max-w-[97%]">
-        {/* Header */}
-        <div className=" text-left">
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <div className="w-10 h-10 bg-teal-600 rounded-lg flex items-center justify-center shadow-md">
+    <div className="min-h-screen bg-white">
+      {/* Navbar */}
+      <header className="w-full bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40">
+        <nav className="max-w-7xl w-[95%] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+          {/* Logo - Clickable */}
+          <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition">
+            <div className="flex items-center justify-center w-10 h-10 bg-teal-600 rounded-lg shadow-md">
               <svg
                 className="w-5 h-5 text-white fill-current transform translate-x-px"
                 xmlns="http://www.w3.org/2000/svg"
@@ -156,122 +157,138 @@ export default function SignupForm() {
                 <path d="M3 22v-20l18 10-18 10z" />
               </svg>
             </div>
-            <div className="flex flex-col leading-none">
-              <span className="text-2xl font-extrabold text-teal-600">
+            <div className="flex flex-col text-left leading-none">
+              <span className="text-xl sm:text-2xl font-extrabold text-teal-600">
                 MeetingAI
               </span>
-              <span className="text-xs font-medium text-gray-500">
+              <span className="hidden sm:inline text-xs sm:text-sm font-medium text-gray-500">
                 Intelligent Meeting Insights
               </span>
-              {/* <img src="/images/ai-meeting.png" alt="MeetingAI Logo" className="w-10 h-10 mt-2" /> */}
             </div>
-          </div>
-        </div>
+          </Link>
 
-        <div className="">
-          <h2 className="text-3xl font-bold text-center text-black mb-8">Sign Up To Get Started</h2>
+          {/* Auth Links */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            <Link
+              href="/auth/login"
+              className="px-4 py-2 text-sm sm:text-base font-medium bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition"
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            {/* First Name & Last Name Row */}
-            <div className="grid grid-cols-2 text-black gap-3 md:gap-4">
-              <FormInput
-                label="First Name"
-                type="text"
-                placeholder="e.g. Daniel"
-                required
-                error={errors.firstName?.message}
-                disabled={loading || isSubmitting}
-                {...register("firstName")}
-              />
-              <FormInput
-                label="Last Name"
-                type="text"
-                placeholder="e.g. Ahmadi"
-                required
-                error={errors.lastName?.message}
-                disabled={loading || isSubmitting}
-                {...register("lastName")}
-              />
-            </div>
-
-            {/* Email & Username Row */}
-            <div className="grid grid-cols-2 text-black gap-3 md:gap-4">
-              <FormInput
-                label="Email"
-                type="email"
-                placeholder="e.g. daniel@example.com"
-                required
-                error={errors.email?.message}
-                disabled={loading || isSubmitting}
-                {...register("email")}
-              />
-              <FormInput
-                label="Username"
-                type="text"
-                placeholder="e.g. danielahmadi123"
-                required
-                error={errors.username?.message}
-                disabled={loading || isSubmitting}
-                {...register("username")}
-              />
-            </div>
-
-            {/* Password & Confirm Password Row */}
-            <div className="grid grid-cols-2 text-black gap-3 md:gap-4">
-              <FormInput
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                required
-                error={errors.password?.message}
-                disabled={loading || isSubmitting}
-                showPasswordToggle={true}
-                showPassword={showPassword}
-                onTogglePassword={() => setShowPassword(!showPassword)}
-                {...register("password")}
-              />
-              <FormInput
-                label="Confirm Password"
-                type={showConfirmPassword ? "text" : "password"}
-                placeholder="••••••••"
-                required
-                error={errors.confirmPassword?.message}
-                disabled={loading || isSubmitting}
-                showPasswordToggle={true}
-                showPassword={showConfirmPassword}
-                onTogglePassword={() => setShowConfirmPassword(!showConfirmPassword)}
-                {...register("confirmPassword")}
-              />
-            </div>
-
-            {/* Sign Up Button */}
-            <button
-              type="submit"
-              className="w-full bg-linear-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-semibold p-3 rounded-lg transition transform hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
-              disabled={loading || isSubmitting}
             >
-              {loading || isSubmitting ? "Creating Account..." : "Sign Up"}
-              {!loading && !isSubmitting && <ArrowRight className="w-5 h-5" />}
-            </button>
-            {/* Divider */}
+              Login
+            </Link>
+          </div>
+        </nav>
+      </header>
 
-            <div className="relative mt-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-3 bg-white text-gray-500 font-medium">or</span>
-              </div>
-            </div>
+      {/* Content */}
+      <div className="flex pt-6 items-start md:items-center justify-center px-4 overflow-y-auto" style={{ minHeight: 'calc(100vh - 65px)' }}>
+        <div className="w-full max-w-2xl md:max-w-[50%] py-8 max-w-[97%]">
 
-            {/* Sign In Link */}
-            <p className="text-center text-gray-600 text-sm">
-              Already have an account?{" "}
-              <a href="/auth/login" className="font-semibold text-teal-600 hover:text-teal-700 transition">
-                Sign In
-              </a>
-            </p>
-          </form>
+          <div className="">
+            <h2 className="text-3xl font-bold text-center text-black mb-8">Sign Up To Get Started</h2>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              {/* First Name & Last Name Row */}
+              <div className="grid grid-cols-2 text-black gap-3 md:gap-4">
+                <FormInput
+                  label="First Name"
+                  type="text"
+                  placeholder="e.g. Daniel"
+                  required
+                  error={errors.firstName?.message}
+                  disabled={loading || isSubmitting}
+                  {...register("firstName")}
+                />
+                <FormInput
+                  label="Last Name"
+                  type="text"
+                  placeholder="e.g. Ahmadi"
+                  required
+                  error={errors.lastName?.message}
+                  disabled={loading || isSubmitting}
+                  {...register("lastName")}
+                />
+              </div>
+
+              {/* Email & Username Row */}
+              <div className="grid grid-cols-2 text-black gap-3 md:gap-4">
+                <FormInput
+                  label="Email"
+                  type="email"
+                  placeholder="e.g. daniel@example.com"
+                  required
+                  error={errors.email?.message}
+                  disabled={loading || isSubmitting}
+                  {...register("email")}
+                />
+                <FormInput
+                  label="Username"
+                  type="text"
+                  placeholder="e.g. danielahmadi123"
+                  required
+                  error={errors.username?.message}
+                  disabled={loading || isSubmitting}
+                  {...register("username")}
+                />
+              </div>
+
+              {/* Password & Confirm Password Row */}
+              <div className="grid grid-cols-2 text-black gap-3 md:gap-4">
+                <FormInput
+                  label="Password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  required
+                  error={errors.password?.message}
+                  disabled={loading || isSubmitting}
+                  showPasswordToggle={true}
+                  showPassword={showPassword}
+                  onTogglePassword={() => setShowPassword(!showPassword)}
+                  {...register("password")}
+                />
+                <FormInput
+                  label="Confirm Password"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  required
+                  error={errors.confirmPassword?.message}
+                  disabled={loading || isSubmitting}
+                  showPasswordToggle={true}
+                  showPassword={showConfirmPassword}
+                  onTogglePassword={() => setShowConfirmPassword(!showConfirmPassword)}
+                  {...register("confirmPassword")}
+                />
+              </div>
+
+              {/* Sign Up Button */}
+              <button
+                type="submit"
+                className="w-full bg-linear-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-semibold p-3 rounded-lg transition transform hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
+                disabled={loading || isSubmitting}
+              >
+                {loading || isSubmitting ? "Creating Account..." : "Sign Up"}
+                {!loading && !isSubmitting && <ArrowRight className="w-5 h-5" />}
+              </button>
+              {/* Divider */}
+
+              <div className="relative mt-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-3 bg-white text-gray-500 font-medium">or</span>
+                </div>
+              </div>
+
+              {/* Sign In Link */}
+              <p className="text-center text-gray-600 text-sm">
+                Already have an account?{" "}
+                <a href="/auth/login" className="font-semibold text-teal-600 hover:text-teal-700 transition">
+                  Login
+                </a>
+              </p>
+            </form>
+          </div>
         </div>
       </div>
     </div>

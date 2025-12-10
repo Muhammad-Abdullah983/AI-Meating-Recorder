@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Camera, Upload as UploadIcon } from 'lucide-react';
+import { Camera, Upload as UploadIcon, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -56,6 +56,9 @@ const ProfilePage = () => {
     const [message, setMessage] = useState('');
     const [status, setStatus] = useState('available');
     const [activeTab, setActiveTab] = useState('profile');
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     // Profile form
     const {
@@ -372,27 +375,54 @@ const ProfilePage = () => {
                             <form onSubmit={handleSubmitPassword(onPasswordSubmit)}>
                                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Change Password</h2>
                                 <div className="space-y-6 text-black">
-                                    <FormInput
-                                        label="Current Password"
-                                        type="password"
-                                        placeholder="Enter current password"
-                                        error={passwordErrors.currentPassword?.message}
-                                        {...registerPassword("currentPassword")}
-                                    />
-                                    <FormInput
-                                        label="New Password"
-                                        type="password"
-                                        placeholder="Enter new password"
-                                        error={passwordErrors.newPassword?.message}
-                                        {...registerPassword("newPassword")}
-                                    />
-                                    <FormInput
-                                        label="Confirm New Password"
-                                        type="password"
-                                        placeholder="Confirm new password"
-                                        error={passwordErrors.confirmPassword?.message}
-                                        {...registerPassword("confirmPassword")}
-                                    />
+                                    <div className="relative">
+                                        <FormInput
+                                            label="Current Password"
+                                            type={showCurrentPassword ? "text" : "password"}
+                                            placeholder="Enter current password"
+                                            error={passwordErrors.currentPassword?.message}
+                                            {...registerPassword("currentPassword")}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                            className="absolute right-3 top-[43px] text-gray-500 hover:text-gray-700"
+                                        >
+                                            {showCurrentPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                        </button>
+                                    </div>
+                                    <div className="relative">
+                                        <FormInput
+                                            label="New Password"
+                                            type={showNewPassword ? "text" : "password"}
+                                            placeholder="Enter new password"
+                                            error={passwordErrors.newPassword?.message}
+                                            {...registerPassword("newPassword")}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowNewPassword(!showNewPassword)}
+                                            className="absolute right-3 top-[43px] text-gray-500 hover:text-gray-700"
+                                        >
+                                            {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                        </button>
+                                    </div>
+                                    <div className="relative">
+                                        <FormInput
+                                            label="Confirm New Password"
+                                            type={showConfirmPassword ? "text" : "password"}
+                                            placeholder="Confirm new password"
+                                            error={passwordErrors.confirmPassword?.message}
+                                            {...registerPassword("confirmPassword")}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            className="absolute right-3 top-[43px] text-gray-500 hover:text-gray-700"
+                                        >
+                                            {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className="mt-6 flex justify-end">
                                     <button

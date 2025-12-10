@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -165,13 +166,13 @@ export default function VerifyForm() {
   }
 
   return (
-    <div className="fixed inset-0 bg-white  flex items-center justify-center px-4">
-
-      <div className="w-full  max-w-md">
-        {/* Header */}
-        <div className="mb-4 pt-10 text-center">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-teal-600 rounded-lg flex items-center justify-center shadow-md">
+    <div className="fixed inset-0 bg-white">
+      {/* Navbar */}
+      <header className="w-full bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40">
+        <nav className="max-w-7xl w-[95%] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+          {/* Logo - Clickable */}
+          <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition">
+            <div className="flex items-center justify-center w-10 h-10 bg-teal-600 rounded-lg shadow-md">
               <svg
                 className="w-5 h-5 text-white fill-current transform translate-x-px"
                 xmlns="http://www.w3.org/2000/svg"
@@ -181,96 +182,118 @@ export default function VerifyForm() {
               </svg>
             </div>
             <div className="flex flex-col text-left leading-none">
-              <span className="text-2xl font-extrabold text-teal-600">
+              <span className="text-xl sm:text-2xl font-extrabold text-teal-600">
                 MeetingAI
               </span>
-              <span className="text-xs font-medium text-gray-500">
+              <span className="hidden sm:inline text-xs sm:text-sm font-medium text-gray-500">
                 Intelligent Meeting Insights
               </span>
             </div>
-          </div>
-        </div>
+          </Link>
 
-        <div className="p-8 md:p-10 text-black">
-          <h2 className="text-3xl text-center font-bold text-gray-900 mb-2">Verify Email</h2>
-          <p className="text-gray-600 text-center text-sm mb-6">Enter the 6-digit code we sent to your email</p>
-
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            {/* OTP Input */}
-            <FormInput
-              label="Verification Code"
-              type="text"
-              placeholder="000000"
-              maxLength={6}
-              required
-              error={errors.otp?.message}
-              disabled={loading || isSubmitting}
-              className="text-center tracking-widest text-3xl font-bold"
-              {...register("otp", {
-                onChange: (e) => {
-                  e.target.value = e.target.value.replace(/\D/g, "");
-                }
-              })}
-            />
-
-            {/* Verify Button */}
-            <button
-              type="submit"
-              className="w-full bg-linear-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-semibold p-3 rounded-lg transition transform hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
-              disabled={loading || isSubmitting || timeLeft <= 0}
+          {/* Auth Links */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            <Link
+              href="/auth/login"
+              className="px-4 py-2 text-sm sm:text-base font-medium text-gray-700 hover:text-teal-600 transition"
             >
-              {loading || isSubmitting ? "Verifying..." : timeLeft <= 0 ? "Code Expired" : "Verify"}
-            </button>
+              Login
+            </Link>
+            <Link
+              href="/auth/signup"
+              className="px-4 py-2 text-sm sm:text-base font-medium bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition"
+            >
+              Sign Up
+            </Link>
+          </div>
+        </nav>
+      </header>
 
-            {/* Timer Display - Below Verify Button */}
-            <div className="flex items-center justify-center gap-2 mt-4">
-              <Clock className={`w-4 h-4 ${timeLeft <= 10 ? 'text-red-500' : 'text-teal-600'}`} />
-              <span className={`text-sm font-medium ${timeLeft <= 10 ? 'text-red-600' : 'text-gray-600'}`}>
-                {timeLeft > 0 ? (
-                  <>Code expires in <span className="font-bold">{formatTime(timeLeft)}</span></>
-                ) : (
-                  <span className="text-red-600 font-semibold">Code expired! Request a new one</span>
-                )}
-              </span>
-            </div>
+      {/* Content */}
+      <div className="flex items-center justify-center px-4" style={{ height: 'calc(100vh - 65px)' }}>
+        <div className="w-full max-w-md">
 
-            {/* Divider */}
-            <div className="relative mt-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-3 bg-white text-gray-500 font-medium">or</span>
-              </div>
-            </div>
+          <div className="p-8 md:p-10 text-black">
+            <h2 className="text-3xl text-center font-bold text-gray-900 mb-2">Verify Email</h2>
+            <p className="text-gray-600 text-center text-sm mb-6">Enter the 6-digit code we sent to your email</p>
 
-            {/* Resend Code */}
-            <p className="text-center text-gray-600 text-sm">
-              Didn't receive the code?{" "}
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              {/* OTP Input */}
+              <FormInput
+                label="Verification Code"
+                type="text"
+                placeholder="000000"
+                maxLength={6}
+                required
+                error={errors.otp?.message}
+                disabled={loading || isSubmitting}
+                className="text-center tracking-widest text-3xl font-bold"
+                {...register("otp", {
+                  onChange: (e) => {
+                    e.target.value = e.target.value.replace(/\D/g, "");
+                  }
+                })}
+              />
+
+              {/* Verify Button */}
               <button
-                type="button"
-                onClick={handleResendCode}
-
-                className="font-semibold text-teal-600 cursor-pointer hover:text-teal-700 transition disabled:opacity-50"
+                type="submit"
+                className="w-full bg-linear-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-semibold p-3 rounded-lg transition transform hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
+                disabled={loading || isSubmitting || timeLeft <= 0}
               >
-                {resendLoading ? "Sending..." : "Resend Code"}
+                {loading || isSubmitting ? "Verifying..." : timeLeft <= 0 ? "Code Expired" : "Verify"}
               </button>
-            </p>
 
-            {/* Back to Signup Button - Always visible */}
-            <p className="text-center cursor-pointer text-gray-600 text-sm mt-4 flex items-center justify-center gap-2">
-              <IoMdArrowRoundBack className="w-5 h-5 text-teal-600" />
+              {/* Timer Display - Below Verify Button */}
+              <div className="flex items-center justify-center gap-2 mt-4">
+                <Clock className={`w-4 h-4 ${timeLeft <= 10 ? 'text-red-500' : 'text-teal-600'}`} />
+                <span className={`text-sm font-medium ${timeLeft <= 10 ? 'text-red-600' : 'text-gray-600'}`}>
+                  {timeLeft > 0 ? (
+                    <>Code expires in <span className="font-bold">{formatTime(timeLeft)}</span></>
+                  ) : (
+                    <span className="text-red-600 font-semibold">Code expired! Request a new one</span>
+                  )}
+                </span>
+              </div>
 
-              <button
-                type="button"
-                onClick={handleBackToSignup}
-                className="font-semibold text-teal-600 hover:text-teal-700 transition cursor-pointer"
-              >
-                Back to Signup
-              </button>
-            </p>
-          </form>
+              {/* Divider */}
+              <div className="relative mt-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-3 bg-white text-gray-500 font-medium">or</span>
+                </div>
+              </div>
+
+              {/* Resend Code */}
+              <p className="text-center text-gray-600 text-sm">
+                Didn't receive the code?{" "}
+                <button
+                  type="button"
+                  onClick={handleResendCode}
+
+                  className="font-semibold text-teal-600 cursor-pointer hover:text-teal-700 transition disabled:opacity-50"
+                >
+                  {resendLoading ? "Sending..." : "Resend Code"}
+                </button>
+              </p>
+
+              {/* Back to Signup Button - Always visible */}
+              <p className="text-center cursor-pointer text-gray-600 text-sm mt-4 flex items-center justify-center gap-2">
+                <IoMdArrowRoundBack className="w-5 h-5 text-teal-600" />
+
+                <button
+                  type="button"
+                  onClick={handleBackToSignup}
+                  className="font-semibold text-teal-600 hover:text-teal-700 transition cursor-pointer"
+                >
+                  Back to Signup
+                </button>
+              </p>
+            </form>
+          </div>
         </div>
       </div>
     </div>

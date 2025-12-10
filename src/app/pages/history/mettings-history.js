@@ -310,7 +310,7 @@ const MeetingHistory = () => {
                     onClick={() => router.push('/upload')}
                     className="md:px-6 px-4 py-3 md:py-3 text-sm bg-teal-600 md:text-lg text-white font-semibold rounded-lg hover:bg-teal-700 transition-colors duration-200 flex items-center gap-2"
                 >
-                    Upload Another File
+                    Upload File
                 </button>
                 <button
                     onClick={() => router.push('/dashboard')}

@@ -100,6 +100,40 @@ export const checkAuth = createAsyncThunk(
     }
 );
 
+export const requestPasswordReset = createAsyncThunk(
+    "auth/requestPasswordReset",
+    async ({ email }, { rejectWithValue }) => {
+        try {
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: `${window.location.origin}/auth/reset-password`,
+            });
+
+            if (error) throw error;
+
+            return { email };
+        } catch (err) {
+            return rejectWithValue(err.message || "Failed to send reset email");
+        }
+    }
+);
+
+export const resetPassword = createAsyncThunk(
+    "auth/resetPassword",
+    async ({ password }, { rejectWithValue }) => {
+        try {
+            const { error } = await supabase.auth.updateUser({
+                password: password,
+            });
+
+            if (error) throw error;
+
+            return { success: true };
+        } catch (err) {
+            return rejectWithValue(err.message || "Failed to reset password");
+        }
+    }
+);
+
 const initialState = {
     user: null,
     session: null,
