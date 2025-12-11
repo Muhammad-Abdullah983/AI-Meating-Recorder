@@ -63,10 +63,22 @@ export const logoutUser = createAsyncThunk(
         try {
             const { error } = await supabase.auth.signOut();
             if (error) throw error;
-            // Clear access token from localStorage (client-side only)
+
+            // Clear all localStorage items (client-side only)
             if (typeof window !== 'undefined') {
                 try {
-                    localStorage.removeItem("accessToken");
+                    // Get all keys before clearing to identify user-specific data
+                    const keysToRemove = [];
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        // Remove access token and any user-specific data
+                        if (key === 'accessToken' || key?.startsWith('userProfile_') || key?.startsWith('userStatus_') || key?.startsWith('profilePicture_')) {
+                            keysToRemove.push(key);
+                        }
+                    }
+
+                    // Remove identified keys
+                    keysToRemove.forEach(key => localStorage.removeItem(key));
                 } catch (_) { }
             }
             return null;

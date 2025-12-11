@@ -39,7 +39,7 @@ export default function LoginForm() {
       })).unwrap();
 
       if (result) {
-        toast.success("Login successful! Welcome back.");
+        toast.success("Login successful!");
         router.push("/");
       }
     } catch (err) {

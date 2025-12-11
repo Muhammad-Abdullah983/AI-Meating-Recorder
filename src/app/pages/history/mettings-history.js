@@ -145,7 +145,7 @@ const MeetingHistory = () => {
                                 <button
                                     onClick={() => setSelectionMode(true)}
                                     className="px-4 py-2 bg-teal-500 text-white cursor-pointer rounded-lg hover:bg-teal-700 transition font-semibold"
-                                    title="Enable selection"
+                                   
                                 >
                                     Select
                                 </button>
@@ -217,7 +217,7 @@ const MeetingHistory = () => {
                                     <tr
                                         key={meeting.id}
                                         onClick={() => router.push(`/details/${meeting.id}`)}
-                                        className="hover:bg-teal-100 transition cursor-pointer"
+                                        className="hover:bg-gray-100 transition cursor-pointer"
                                     >
                                         {selectionMode && (
                                             <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
@@ -308,17 +308,19 @@ const MeetingHistory = () => {
             )}
             <div className="mt-8 sm:w-[100%] w-[88%] mx-auto flex gap-2 md:gap-4 justify-center pb-8">
                 <button
-                    onClick={() => router.push('/upload')}
-                    className="md:px-6 px-4 py-3 md:py-3 text-sm cursor-pointer bg-teal-600 md:text-lg text-white font-semibold rounded-lg hover:bg-teal-700 transition-colors duration-200 flex items-center gap-2"
-                >
-                    Upload File
-                </button>
-                <button
                     onClick={() => router.push('/dashboard')}
-                    className="md:px-6 px-4 py-3 md:py-3 bg-gray-600 text-sm cursor-pointer md:text-lg text-white font-semibold rounded-lg hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2"
+                    className="md:px-6 px-4 py-3 md:py-3 bg-white text-sm cursor-pointer shadow-lg md:text-lg text-gray-800 font-semibold rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2"
                 >
                     ← Back to Dashboard
                 </button>
+
+                <button
+                    onClick={() => router.push('/upload')}
+                    className="md:px-6 px-4 py-3 md:py-3 text-sm cursor-pointer shadow-lg bg-teal-600 md:text-lg text-white font-semibold rounded-lg hover:bg-teal-700 transition-colors duration-200 flex items-center gap-2"
+                >
+                    Upload File
+                </button>
+
             </div>
         </div>
 

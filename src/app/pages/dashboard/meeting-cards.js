@@ -131,13 +131,13 @@ const MeetingCards = ({ searchQuery = '' }) => {
                         onMouseEnter={() => setHoveredCard(meeting.id)}
                         onMouseLeave={() => setHoveredCard(null)}
                         // onClick={() => router.push(`/details/${meeting.id}`)}
-                        className={`group rounded-xl border-2 transition-all duration-300 overflow-hidden transform hover:scale-100 hover:shadow-2xl ${getStatusColor(meeting.status)}`}
+                        className={`group rounded-xl border-2 hover:border-teal-600 hover:border-2 transition-all duration-300 overflow-hidden transform hover:scale-100 hover:shadow-2xl ${getStatusColor(meeting.status)}`}
                     >
                         {/* Card Content */}
                         <div className="p-6">
                             {/* Status Badge and Title */}
                             <div className="flex items-start justify-between mb-4">
-                                <h3 className="text-lg font-bold text-gray-900 line-clamp-2 group-hover:text-teal-600 transition-colors flex-1">
+                                <h3 className="text-lg font-bold text-gray-900 line-clamp-2 group-hover:text-teal-600  transition-colors flex-1">
                                     {meeting.meeting_name}
                                 </h3>
                                 <div className="p-2 bg-white rounded-full  ml-2">
