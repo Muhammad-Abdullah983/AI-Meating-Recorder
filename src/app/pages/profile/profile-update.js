@@ -297,11 +297,11 @@ const ProfilePage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen  bg-gray-50">
             {/* Header */}
-            <div className="relative h-52 bg-cover bg-center" style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1523961131990-5ea7c61b2107?w=1200&auto=format&fit=crop&q=60&ixlib=rb-4.1.0")' }}>
+            <div className="relative h-52  bg-cover bg-center" style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1523961131990-5ea7c61b2107?w=1200&auto=format&fit=crop&q=60&ixlib=rb-4.1.0")' }}>
                 <div className="absolute inset-0 bg-linear-to-b from-black/40 to-black/20"></div>
-                <div className="absolute left-1/2 -translate-x-1/2 bottom-0  translate-y-1/2 w-full max-w-5xl px-6">
+                <div className="absolute left-1/2 -translate-x-1/2 bottom-0  translate-y-1/2 w-full max-w-7xl px-6">
                     <div className="flex items-end gap-4">
                         <div className="relative pb-4 ">
                             <img
@@ -340,7 +340,7 @@ const ProfilePage = () => {
             />
 
             {/* Tabs + Content */}
-            <div className="max-w-5xl mx-auto py-34 px-4 sm:px-6 lg:px-8 pb-8">
+            <div className="max-w-7xl md:w-[94%] mx-auto py-34 px-4 sm:px-6 lg:px-8 pb-8">
                 <div className="bg-white shadow-lg rounded-xl">
                     <div className="border-b px-6 pt-4">
                         <div className="flex gap-6 ">
@@ -474,8 +474,8 @@ const ProfilePage = () => {
 
                         {activeTab === 'password' && (
                             <form onSubmit={handleSubmitPassword(onPasswordSubmit)}>
-                                <h2 className="text-2xl font-bold text-gray-900 mb-6">Change Password</h2>
-                                <div className="space-y-6 text-black">
+                                <h2 className="text-2xl font-bold max-w-4xl text-gray-900 mb-6">Change Password</h2>
+                                <div className="space-y-6 text-black max-w-2xl">
                                     <div className="relative">
                                         <FormInput
                                             label="Current Password"
