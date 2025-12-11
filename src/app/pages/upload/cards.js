@@ -1,17 +1,7 @@
 import React from 'react';
 import { Zap, CheckCircle, FileText } from 'lucide-react';
 
-/**
- * Reusable component for a single feature card in this section.
- * It handles the distinct coloring of the icon background for each card.
- *
- * @param {object} props - Component props
- * @param {React.Component} props.icon - Lucide icon component.
- * @param {string} props.iconBg - Tailwind CSS class for the background color (e.g., 'bg-blue-100').
- * @param {string} props.iconText - Tailwind CSS class for the icon color (e.g., 'text-blue-600').
- * @param {string} props.title - The main feature title (e.g., 'Instant Analysis').
- * @param {string} props.description - The supporting text.
- */
+
 const FeatureCard = ({ icon: Icon, iconBg, iconText, title, description }) => {
   return (
     <div className="
@@ -26,7 +16,7 @@ const FeatureCard = ({ icon: Icon, iconBg, iconText, title, description }) => {
       hover:shadow-lg
         hover:border-teal-600
               hover:border-2
-        cursor-pointer
+      
     ">
       {/* Icon Area */}
       <div className={`

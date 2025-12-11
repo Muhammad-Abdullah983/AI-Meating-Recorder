@@ -13,7 +13,9 @@ const FeatureCard = ({ icon: Icon, title, description }) => {
         h-50
         flex flex-col
         transition duration-300 ease-in-out
-        hover:shadow-lg hover:border-teal-300
+        hover:shadow-lg
+         hover:border-teal-600
+         hover:border-2
         w-full
       "
         >

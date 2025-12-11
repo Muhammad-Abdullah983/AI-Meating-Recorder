@@ -524,13 +524,13 @@ const MeetingDetailsPage = ({ meetingId }) => {
             <div className="mt-8 flex gap-4 justify-center pb-8">
                 <button
                     onClick={() => router.push('/upload')}
-                    className="md:px-6 px-4 py-4 md:py-3 text-sm md:text-lg bg-teal-600 text-white font-bold rounded-lg hover:bg-teal-700 transition-colors duration-200 flex items-center gap-2"
+                    className="md:px-6 px-4 py-4 md:py-3 text-sm cursor-pointer md:text-lg bg-teal-600 text-white font-bold rounded-lg hover:bg-teal-700 transition-colors duration-200 flex items-center gap-2"
                 >
                     Upload Another File
                 </button>
                 <button
                     onClick={() => router.push('/dashboard')}
-                    className="md:px-6 px-4 py-4 md:py-3 text-sm md:text-lg bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2"
+                    className="md:px-6 px-4 py-4 md:py-3 text-sm md:text-lg cursor-pointer bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2"
                 >
                     ← Back to Dashboard
                 </button>

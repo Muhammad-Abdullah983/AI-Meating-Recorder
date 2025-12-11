@@ -144,7 +144,7 @@ const MeetingHistory = () => {
                             {!selectionMode && (
                                 <button
                                     onClick={() => setSelectionMode(true)}
-                                    className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-700 transition font-semibold"
+                                    className="px-4 py-2 bg-teal-500 text-white cursor-pointer rounded-lg hover:bg-teal-700 transition font-semibold"
                                     title="Enable selection"
                                 >
                                     Select
@@ -155,15 +155,15 @@ const MeetingHistory = () => {
                                     <button
                                         onClick={() => setDeleteConfirm('selected')}
                                         disabled={selectedIds.length === 0}
-                                        className={`px-2 py-0 md:py-2 rounded-lg transition font-medium flex items-center gap-2 ${selectedIds.length === 0 ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : 'bg-red-500 text-white hover:bg-red-700'}`}
+                                        className={`px-2 py-0 md:py-2 rounded-lg transition font-medium flex items-center gap-2 ${selectedIds.length === 0 ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : 'bg-red-500 cursor-pointer text-white hover:bg-red-700'}`}
                                         title="Delete selected meetings"
                                     >
-                                        <Trash2 className="w-4 h-4" />
+                                        <Trash2 className="w-4 h-4 cursor-pointer" />
                                         Delete Selected
                                     </button>
                                     <button
                                         onClick={exitSelectionMode}
-                                        className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-medium"
+                                        className="px-4 py-2 bg-gray-200 cursor-pointer text-gray-800 rounded-lg hover:bg-gray-300 transition font-medium"
                                         title="Exit selection"
                                     >
                                         Cancel
@@ -225,6 +225,7 @@ const MeetingHistory = () => {
                                                     type="checkbox"
                                                     checked={selectedIds.includes(meeting.id)}
                                                     onChange={() => toggleSelect(meeting.id)}
+                                                    className="cursor-pointer"
                                                 />
                                             </td>
                                         )}
@@ -248,17 +249,17 @@ const MeetingHistory = () => {
                                         <td className="px-6 py-2 md:py-4 text-sm space-x-2 flex" onClick={(e) => e.stopPropagation()}>
                                             <button
                                                 onClick={() => router.push(`/details/${meeting.id}`)}
-                                                className="text-indigo-600 hover:text-indigo-900 transition p-2 hover:bg-indigo-50 rounded"
+                                                className="text-indigo-600 hover:text-indigo-900 transition p-2  rounded"
                                                 title="View Details"
                                             >
-                                                <Eye className="w-5 h-5" />
+                                                <Eye className="w-5 h-5 cursor-pointer" />
                                             </button>
                                             <button
                                                 onClick={() => setDeleteConfirm(meeting.id)}
                                                 className="text-red-500 hover:text-red-900 transition p-2 hover:bg-red-50 rounded"
                                                 title="Delete"
                                             >
-                                                <Trash2 className="w-5 h-5" />
+                                                <Trash2 className="w-5 h-5 cursor-pointer" />
                                             </button>
                                         </td>
                                     </tr>
@@ -308,13 +309,13 @@ const MeetingHistory = () => {
             <div className="mt-8 sm:w-[100%] w-[88%] mx-auto flex gap-2 md:gap-4 justify-center pb-8">
                 <button
                     onClick={() => router.push('/upload')}
-                    className="md:px-6 px-4 py-3 md:py-3 text-sm bg-teal-600 md:text-lg text-white font-semibold rounded-lg hover:bg-teal-700 transition-colors duration-200 flex items-center gap-2"
+                    className="md:px-6 px-4 py-3 md:py-3 text-sm cursor-pointer bg-teal-600 md:text-lg text-white font-semibold rounded-lg hover:bg-teal-700 transition-colors duration-200 flex items-center gap-2"
                 >
                     Upload File
                 </button>
                 <button
                     onClick={() => router.push('/dashboard')}
-                    className="md:px-6 px-4 py-3 md:py-3 bg-gray-600 text-sm  md:text-lg text-white font-semibold rounded-lg hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2"
+                    className="md:px-6 px-4 py-3 md:py-3 bg-gray-600 text-sm cursor-pointer md:text-lg text-white font-semibold rounded-lg hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2"
                 >
                     ← Back to Dashboard
                 </button>

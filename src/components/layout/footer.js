@@ -57,7 +57,7 @@ export default function Footer() {
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/meetings/upload" className="text-sm hover:text-teal-400 transition">
+                                <Link href="/upload" className="text-sm hover:text-teal-400 transition">
                                     Upload Meetings
                                 </Link>
                             </li>

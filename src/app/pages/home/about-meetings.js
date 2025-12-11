@@ -3,11 +3,6 @@ import Link from 'next/link';
 // Assuming these Lucide icons are available in your Next.js environment
 import { UploadCloud, Code, Zap, CheckCircle, Users, Lock, Link as LinkIcon } from 'lucide-react';
 
-/**
- * Reusable component for a single feature card.
- * It implements the styling from the image: rounded corners, light border,
- * and a prominent icon area.
- */
 const FeatureBox = ({ icon: Icon, title, description, link }) => {
     const content = (
         <div className="
@@ -22,7 +17,7 @@ const FeatureBox = ({ icon: Icon, title, description, link }) => {
       flex flex-col
         hover:border-teal-600
               hover:border-2
-        cursor-pointer
+      
     ">
             {/* Icon Area */}
             <div className="mb-4">
@@ -121,6 +116,7 @@ const CallToAction = () => {
               transition duration-300 ease-in-out
               transform hover:scale-[1.02]
               w-full sm:w-auto
+              cursor-pointer
             "
                     >
                         Contact Sales

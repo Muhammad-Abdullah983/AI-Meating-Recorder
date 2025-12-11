@@ -53,9 +53,10 @@ const ProfilePage = () => {
 
     const [profilePicture, setProfilePicture] = useState('/profile-pic.jpg');
     const [previewPicture, setPreviewPicture] = useState('/profile-pic.jpg');
+    const [selectedFile, setSelectedFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
-    const [status, setStatus] = useState('available');
+    const [uploadingImage, setUploadingImage] = useState(false);
     const [activeTab, setActiveTab] = useState('profile');
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
@@ -92,27 +93,68 @@ const ProfilePage = () => {
 
     // Load profile from localStorage on component mount
     useEffect(() => {
-        if (typeof window !== 'undefined' && userId) {
-            const savedProfile = localStorage.getItem(`userProfile_${userId}`);
-            const savedProfilePicture = localStorage.getItem(`profilePicture_${userId}`);
-
-            if (savedProfile) {
+        const loadUserProfile = async () => {
+            if (typeof window !== 'undefined' && userId) {
                 try {
-                    const parsedProfile = JSON.parse(savedProfile);
-                    Object.keys(parsedProfile).forEach(key => {
-                        setProfileValue(key, parsedProfile[key]);
-                    });
+                    // Fetch user profile from Supabase
+                    const { data: profileData, error: profileError } = await supabase
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', userId)
+                        .single();
+
+                    if (profileError) {
+                        console.error('Error fetching profile:', profileError);
+                    }
+
+                    // Set form values from Supabase profile
+                    if (profileData) {
+                        // Split full_name into firstName and lastName
+                        const nameParts = (profileData.full_name || '').split(' ');
+                        const firstName = nameParts[0] || '';
+                        const lastName = nameParts.slice(1).join(' ') || '';
+
+                        setProfileValue('firstName', firstName);
+                        setProfileValue('lastName', lastName);
+                        setProfileValue('email', profileData.email || user?.email || '');
+
+                        // Load other fields from localStorage
+                        const savedProfile = localStorage.getItem(`userProfile_${userId}`);
+                        if (savedProfile) {
+                            try {
+                                const parsedProfile = JSON.parse(savedProfile);
+                                setProfileValue('phone', parsedProfile.phone || '');
+                                setProfileValue('role', parsedProfile.role || '');
+                                setProfileValue('department', parsedProfile.department || '');
+                                setProfileValue('location', parsedProfile.location || '');
+                                setProfileValue('bio', parsedProfile.bio || '');
+                                setProfileValue('linkedin', parsedProfile.linkedin || '');
+                                setProfileValue('github', parsedProfile.github || '');
+                            } catch (error) {
+                                console.error('Error parsing saved profile:', error);
+                            }
+                        }
+
+                        // Load profile picture from Supabase Storage
+                        if (profileData.avatar_url) {
+                            const { data: publicUrlData } = supabase.storage
+                                .from('avatars')
+                                .getPublicUrl(profileData.avatar_url);
+
+                            if (publicUrlData?.publicUrl) {
+                                setProfilePicture(publicUrlData.publicUrl);
+                                setPreviewPicture(publicUrlData.publicUrl);
+                            }
+                        }
+                    }
                 } catch (error) {
                     console.error('Error loading profile:', error);
                 }
             }
+        };
 
-            if (savedProfilePicture) {
-                setProfilePicture(savedProfilePicture);
-                setPreviewPicture(savedProfilePicture);
-            }
-        }
-    }, [userId, setProfileValue]); const handleProfilePictureChange = (e) => {
+        loadUserProfile();
+    }, [userId, setProfileValue, user]); const handleProfilePictureChange = (e) => {
         const file = e.target.files?.[0];
         if (file) {
             // Validate file type
@@ -126,12 +168,16 @@ const ProfilePage = () => {
                 return;
             }
 
+            // Store file for later upload
+            setSelectedFile(file);
+
             // Create preview
             const reader = new FileReader();
             reader.onloadend = () => {
                 setPreviewPicture(reader.result);
             };
             reader.readAsDataURL(file);
+
             setMessage('');
         }
     };
@@ -139,18 +185,74 @@ const ProfilePage = () => {
     const onProfileSubmit = async (data) => {
         setLoading(true);
         try {
-            // Save to localStorage with user-specific key
+            // Combine firstName and lastName into full_name
+            const full_name = `${data.firstName} ${data.lastName}`.trim();
+
+            // Upload profile picture if a new one was selected
+            if (selectedFile) {
+                try {
+                    // Create unique filename
+                    const fileExt = selectedFile.name.split('.').pop();
+                    const fileName = `${userId}-${Date.now()}.${fileExt}`;
+                    const filePath = `${fileName}`;
+
+                    // Upload file to Supabase Storage
+                    const { error: uploadError } = await supabase.storage
+                        .from('avatars')
+                        .upload(filePath, selectedFile, {
+                            cacheControl: '3600',
+                            upsert: true
+                        });
+
+                    if (uploadError) throw uploadError;
+
+                    // Update profile with new avatar URL
+                    const { error: avatarUpdateError } = await supabase
+                        .from('profiles')
+                        .update({ avatar_url: filePath })
+                        .eq('id', userId);
+
+                    if (avatarUpdateError) throw avatarUpdateError;
+
+                    // Get public URL
+                    const { data: publicUrlData } = supabase.storage
+                        .from('avatars')
+                        .getPublicUrl(filePath);
+
+                    if (publicUrlData?.publicUrl) {
+                        setProfilePicture(publicUrlData.publicUrl);
+                    }
+
+                    // Clear selected file after successful upload
+                    setSelectedFile(null);
+                } catch (uploadError) {
+                    console.error('Error uploading profile picture:', uploadError);
+                    toast.error('Failed to upload profile picture.');
+                    // Continue with profile update even if image upload fails
+                }
+            }
+
+            // Update Supabase profiles table
+            const { error: updateError } = await supabase
+                .from('profiles')
+                .update({
+                    full_name: full_name,
+                    email: data.email,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', userId);
+
+            if (updateError) throw updateError;
+
+            // Save additional fields to localStorage (or create a profile_details table later)
             if (typeof window !== 'undefined' && userId) {
                 localStorage.setItem(`userProfile_${userId}`, JSON.stringify(data));
-                localStorage.setItem(`profilePicture_${userId}`, previewPicture);
                 localStorage.setItem(`userStatus_${userId}`, status);
             }
 
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            setProfilePicture(previewPicture);
             toast.success('Profile updated successfully!');
         } catch (error) {
+            console.error('Error saving profile:', error);
             toast.error('Error saving profile. Please try again.');
         } finally {
             setLoading(false);

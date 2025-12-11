@@ -6,10 +6,12 @@ import { useRouter, usePathname } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { logoutUser } from "@/store/authSlice";
 import { Menu, X } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function Navbar() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
+  const [profilePicture, setProfilePicture] = useState(null);
   const dropdownRef = useRef(null);
   const router = useRouter();
   const pathname = usePathname();
@@ -18,6 +20,31 @@ export default function Navbar() {
 
   // Hide navbar on auth pages (login, signup, verify)
   const isAuthPage = pathname?.startsWith('/auth/');
+
+  // Fetch user profile picture
+  useEffect(() => {
+    async function fetchProfilePicture() {
+      if (user?.id) {
+        const { data: profileData, error } = await supabase
+          .from('profiles')
+          .select('avatar_url')
+          .eq('id', user.id)
+          .single();
+
+        if (profileData?.avatar_url) {
+          const { data: urlData } = supabase.storage
+            .from('avatars')
+            .getPublicUrl(profileData.avatar_url);
+
+          if (urlData?.publicUrl) {
+            setProfilePicture(urlData.publicUrl);
+          }
+        }
+      }
+    }
+
+    fetchProfilePicture();
+  }, [user]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -123,10 +150,18 @@ export default function Navbar() {
               <div className="hidden md:block relative" ref={dropdownRef}>
                 <button
                   onClick={() => setShowDropdown(!showDropdown)}
-                  className="w-10 h-10 rounded-full font-bold flex items-center cursor-pointer justify-center transition bg-teal-600 text-white hover:bg-teal-700"
+                  className="w-10 h-10 rounded-full font-bold flex items-center cursor-pointer justify-center transition bg-teal-600 text-white hover:bg-teal-700 overflow-hidden"
                   title={userName}
                 >
-                  {userInitial}
+                  {profilePicture ? (
+                    <img
+                      src={profilePicture}
+                      alt={userName}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span>{userInitial}</span>
+                  )}
                 </button>
 
                 {showDropdown && (
@@ -230,7 +265,7 @@ export default function Navbar() {
 
             {/* Sidebar Navigation */}
             <div className="p-4 space-y-2">
-                 <Link
+              <Link
                 href="/dashboard"
                 onClick={() => setShowSidebar(false)}
                 className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-teal-50 transition"
@@ -244,7 +279,7 @@ export default function Navbar() {
               >
                 Upload
               </Link>
-           
+
               <Link
                 href="/history"
                 onClick={() => setShowSidebar(false)}
@@ -270,10 +305,24 @@ export default function Navbar() {
 
             {/* Sidebar Footer */}
             <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 space-y-2">
-             
-                <p className="text-sm text-gray-700 font-medium">{userName}</p>
-                <p className="text-xs text-gray-700">{userEmail}</p>
-              
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center text-white font-bold overflow-hidden">
+                  {profilePicture ? (
+                    <img
+                      src={profilePicture}
+                      alt={userName}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span>{userInitial}</span>
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm text-gray-700 font-medium">{userName}</p>
+                  <p className="text-xs text-gray-700">{userEmail}</p>
+                </div>
+              </div>
+
               <button
                 onClick={() => {
                   setShowSidebar(false);

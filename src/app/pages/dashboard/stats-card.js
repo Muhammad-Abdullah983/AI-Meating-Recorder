@@ -19,7 +19,6 @@ const MetricCard = ({ icon: Icon, title, value, change, isLoading }) => {
       transition duration-200 ease-in-out
       hover:border-teal-600
       hover:border-2
-      cursor-pointer
       hover:shadow-md
     ">
       <div className="flex justify-between items-start mb-4">

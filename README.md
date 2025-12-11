@@ -261,13 +261,39 @@ CREATE INDEX idx_meetings_created_at ON meetings(created_at DESC);
 CREATE INDEX idx_profiles_email ON profiles(email);
 ```
 
-#### 2. Set up Storage Bucket
+#### 2. Set up Storage Buckets
 
 In **Storage** section of Supabase dashboard:
 
+**Bucket 1: ai_meetings** (for meeting recordings)
 1. Create a new bucket named `ai_meetings`
 2. Set bucket to **Public** (or configure RLS policies as needed)
 3. Configure allowed MIME types: `audio/*`, `video/*`
+
+**Bucket 2: avatars** (for profile pictures)
+1. Create a new bucket named `avatars`
+2. Set bucket to **Public**
+3. Configure allowed MIME types: `image/*`
+4. Add RLS policy:
+```sql
+-- Allow authenticated users to upload their own avatars
+CREATE POLICY "Users can upload own avatar"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1]);
+
+-- Allow public read access to avatars
+CREATE POLICY "Public avatar access"
+ON storage.objects FOR SELECT
+TO public
+USING (bucket_id = 'avatars');
+
+-- Allow users to update their own avatars
+CREATE POLICY "Users can update own avatar"
+ON storage.objects FOR UPDATE
+TO authenticated
+USING (bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1]);
+```
 
 #### 3. Enable Row Level Security (RLS)
 
