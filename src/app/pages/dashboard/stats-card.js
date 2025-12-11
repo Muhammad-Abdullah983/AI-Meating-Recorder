@@ -11,14 +11,13 @@ const MetricCard = ({ icon: Icon, title, value, change, isLoading }) => {
   return (
     <div className="
       p-3 sm:p-6
-      border border-gray-200
+      border-2 border-gray-200
       rounded-xl
       bg-white
       shadow-sm
       flex flex-col
-      transition duration-200 ease-in-out
+      transition duration-300 ease-in-out
       hover:border-teal-600
-      hover:border-2
       hover:shadow-md
     ">
       <div className="flex justify-between items-start mb-4">
@@ -40,7 +39,7 @@ const MetricCard = ({ icon: Icon, title, value, change, isLoading }) => {
           bg-indigo-50
           text-teal-600
           rounded-lg
-          flex items-center justify-center hidden md:flex
+          hidden md:flex items-center justify-center
         ">
           <Icon className="w-5 h-5" />
         </div>

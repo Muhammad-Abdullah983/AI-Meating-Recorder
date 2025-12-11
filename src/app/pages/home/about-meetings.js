@@ -16,7 +16,8 @@ const FeatureBox = ({ icon: Icon, title, description, link }) => {
       transform transition duration-300 ease-in-out
       flex flex-col
         hover:border-teal-600
-              hover:border-2
+   
+       
       
     ">
             {/* Icon Area */}
