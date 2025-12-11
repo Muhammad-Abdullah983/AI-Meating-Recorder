@@ -266,6 +266,11 @@ export default function ResetPasswordForm() {
                                         <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
                                         One lowercase letter
                                     </li>
+
+                                    <li className="flex items-center gap-2">
+                                        <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                                        One special character
+                                    </li>
                                     <li className="flex items-center gap-2">
                                         <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
                                         One number

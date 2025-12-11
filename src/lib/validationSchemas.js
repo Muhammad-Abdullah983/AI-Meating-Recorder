@@ -81,6 +81,7 @@ export const resetPasswordSchema = z.object({
         .max(128, "Password must not exceed 128 characters")
         .regex(/[a-z]/, "Password must contain at least one lowercase letter")
         .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+        .regex(/[\W_]/, "Password must contain at least one special character")
         .regex(/[0-9]/, "Password must contain at least one number"),
     confirmPassword: z
         .string()
@@ -155,6 +156,7 @@ export const passwordSchema = z.object({
         .max(128, "Password must not exceed 128 characters")
         .regex(/[a-z]/, "Password must contain at least one lowercase letter")
         .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+        .regex(/[\W_]/, "Password must contain at least one special character")
         .regex(/[0-9]/, "Password must contain at least one number"),
     confirmPassword: z
         .string()
