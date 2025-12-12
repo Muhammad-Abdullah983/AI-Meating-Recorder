@@ -294,7 +294,7 @@ const MeetingHistory = () => {
                         <div className="flex gap-4">
                             <button
                                 onClick={() => setDeleteConfirm(null)}
-                                className="flex-1 px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition font-medium"
+                                className="flex-1 px-4 py-2 bg-gray-300 cursor-pointer text-gray-800 rounded-lg hover:bg-gray-400 transition font-medium"
                             >
                                 Cancel
                             </button>
@@ -306,7 +306,7 @@ const MeetingHistory = () => {
                                         handleDeleteMeeting(deleteConfirm)
                                     }
                                 }}
-                                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
+                                className="flex-1 px-4 py-2 bg-red-600 text-white cursor-pointer rounded-lg hover:bg-red-700 transition font-medium"
                             >
                                 Delete
                             </button>

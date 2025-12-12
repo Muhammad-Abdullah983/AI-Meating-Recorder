@@ -137,18 +137,33 @@ const DashboardMetrics = () => {
         .gte('created_at', prevWeekStart.toISOString())
         .lt('created_at', weekStart.toISOString())
 
-      const weekChange = prevWeekMeetings && prevWeekMeetings.length > 0
-        ? Math.round(((weekMeetings.length - prevWeekMeetings.length) / prevWeekMeetings.length) * 100)
-        : 0
+      // Calculate week-over-week change
+      let weekChange = 0
+      if (prevWeekMeetings && prevWeekMeetings.length > 0) {
+        weekChange = Math.round(((weekMeetings.length - prevWeekMeetings.length) / prevWeekMeetings.length) * 100)
+      } else if (weekMeetings.length > 0) {
+        // If no previous week data but we have meetings this week, show 100% growth
+        weekChange = 100
+      }
 
-      // Calculate today's change (percentage of today's meetings relative to daily average)
-      const daysSinceFirstMeeting = allMeetings && allMeetings.length > 0
-        ? Math.max(1, Math.ceil((Date.now() - new Date(allMeetings[allMeetings.length - 1].created_at).getTime()) / (1000 * 60 * 60 * 24)))
-        : 1
-      const dailyAverage = allMeetings ? allMeetings.length / daysSinceFirstMeeting : 0
-      const todayChange = dailyAverage > 0 && todayMeetings
-        ? Math.round(((todayMeetings.length - dailyAverage) / dailyAverage) * 100)
-        : 0
+      // Calculate today's change (comparing to yesterday or showing growth if first day)
+      const yesterdayStart = new Date(todayStart)
+      yesterdayStart.setDate(yesterdayStart.getDate() - 1)
+      const yesterdayEnd = new Date(todayStart)
+      yesterdayEnd.setMilliseconds(-1)
+
+      const yesterdayMeetings = allMeetings.filter(m => {
+        const d = new Date(m.created_at)
+        return d >= yesterdayStart && d <= yesterdayEnd
+      })
+
+      let todayChange = 0
+      if (yesterdayMeetings.length > 0) {
+        todayChange = Math.round(((todayMeetings.length - yesterdayMeetings.length) / yesterdayMeetings.length) * 100)
+      } else if (todayMeetings.length > 0) {
+        // If no meetings yesterday but we have meetings today, show 100% growth
+        todayChange = 100
+      }
 
       setMetrics({
         totalMeetings: allMeetings?.length || 0,
