@@ -70,6 +70,8 @@ export default function Navbar() {
   async function handleLogout() {
     try {
       await dispatch(logoutUser()).unwrap();
+      localStorage.removeItem("persist:root");
+      localStorage.removeItem("accessToken");
       router.push("/auth/login");
     } catch (err) {
       console.error("Logout error:", err);
