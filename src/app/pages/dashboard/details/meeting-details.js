@@ -557,14 +557,14 @@ Instructions:
             <div className="mt-8 flex gap-4 justify-center pb-8">
                 <button
                     onClick={() => router.push('/dashboard')}
-                    className="md:px-6 px-4 py-4 md:py-3 text-sm md:text-lg cursor-pointer bg-white shadow-lg text-gray-800 font-bold rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2"
+                    className="md:px-6 px-4 py-4 md:py-3 text-sm md:text-lg cursor-pointer bg-white shadow-xl text-gray-800 font-bold rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2"
                 >
                     ← Back to Dashboard
                 </button>
 
                 <button
                     onClick={() => router.push('/upload')}
-                    className="md:px-6 px-4 py-4 md:py-3 text-sm cursor-pointer md:text-lg bg-teal-600 text-white font-bold shadow-lg rounded-lg hover:bg-teal-700 transition-colors duration-200 flex items-center gap-2"
+                    className="md:px-6 px-4 py-4 md:py-3 text-sm cursor-pointer md:text-lg bg-teal-600 text-white font-bold shadow-xl rounded-lg hover:bg-teal-700 transition-colors duration-200 flex items-center gap-2"
                 >
                     Upload Another File
                 </button>

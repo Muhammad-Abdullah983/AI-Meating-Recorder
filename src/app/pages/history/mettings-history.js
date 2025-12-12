@@ -13,7 +13,6 @@ const MeetingHistory = () => {
     const [isLoading, setIsLoading] = useState(true)
     const [deleteConfirm, setDeleteConfirm] = useState(null)
     const [selectedIds, setSelectedIds] = useState([])
-    const [selectionMode, setSelectionMode] = useState(false)
 
     useEffect(() => {
         fetchMeetings()
@@ -121,9 +120,12 @@ const MeetingHistory = () => {
         setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
     }
 
-    const exitSelectionMode = () => {
-        setSelectionMode(false)
-        setSelectedIds([])
+    const toggleSelectAll = () => {
+        if (selectedIds.length === meetings.length) {
+            setSelectedIds([])
+        } else {
+            setSelectedIds(meetings.map(m => m.id))
+        }
     }
 
 
@@ -139,37 +141,26 @@ const MeetingHistory = () => {
                             View all your uploaded meetings and their transcriptions
                         </p>
                     </div>
-                    {meetings.length > 0 && (
+                    {meetings.length > 0 && selectedIds.length > 0 && (
                         <div className="flex items-center gap-3">
-                            {!selectionMode && (
-                                <button
-                                    onClick={() => setSelectionMode(true)}
-                                    className="px-4 py-2 bg-teal-500 text-white cursor-pointer rounded-lg hover:bg-teal-700 transition font-semibold"
-                                   
-                                >
-                                    Select
-                                </button>
-                            )}
-                            {selectionMode && (
-                                <>
-                                    <button
-                                        onClick={() => setDeleteConfirm('selected')}
-                                        disabled={selectedIds.length === 0}
-                                        className={`px-2 py-0 md:py-2 rounded-lg transition font-medium flex items-center gap-2 ${selectedIds.length === 0 ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : 'bg-red-500 cursor-pointer text-white hover:bg-red-700'}`}
-                                        title="Delete selected meetings"
-                                    >
-                                        <Trash2 className="w-4 h-4 cursor-pointer" />
-                                        Delete Selected
-                                    </button>
-                                    <button
-                                        onClick={exitSelectionMode}
-                                        className="px-4 py-2 bg-gray-200 cursor-pointer text-gray-800 rounded-lg hover:bg-gray-300 transition font-medium"
-                                        title="Exit selection"
-                                    >
-                                        Cancel
-                                    </button>
-                                </>
-                            )}
+                            <span className="text-sm text-gray-600 font-medium">
+                                {selectedIds.length} selected
+                            </span>
+                            <button
+                                onClick={() => setDeleteConfirm('selected')}
+                                className="px-4 py-2 bg-red-500 cursor-pointer text-white rounded-lg hover:bg-red-700 transition font-medium flex items-center gap-2"
+                                title="Delete selected meetings"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                                Delete Selected
+                            </button>
+                            <button
+                                onClick={() => setSelectedIds([])}
+                                className="px-4 py-2 bg-gray-200 cursor-pointer text-gray-800 rounded-lg hover:bg-gray-300 transition font-medium"
+                                title="Clear selection"
+                            >
+                                Clear
+                            </button>
                         </div>
                     )}
                 </div>
@@ -189,9 +180,15 @@ const MeetingHistory = () => {
                         <table className="w-full">
                             <thead className="bg-gray-200 border-b border-gray-200">
                                 <tr>
-                                    {selectionMode && (
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-12"></th>
-                                    )}
+                                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider w-16">
+                                        <input
+                                            type="checkbox"
+                                            checked={meetings.length > 0 && selectedIds.length === meetings.length}
+                                            onChange={toggleSelectAll}
+                                            className="cursor-pointer w-4 h-4"
+                                            title="Select all"
+                                        />
+                                    </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         Title
                                     </th>
@@ -216,34 +213,46 @@ const MeetingHistory = () => {
                                 {meetings.map((meeting) => (
                                     <tr
                                         key={meeting.id}
-                                        onClick={() => router.push(`/details/${meeting.id}`)}
-                                        className="hover:bg-gray-100 transition cursor-pointer"
+                                        className="hover:bg-gray-50 transition"
                                     >
-                                        {selectionMode && (
-                                            <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selectedIds.includes(meeting.id)}
-                                                    onChange={() => toggleSelect(meeting.id)}
-                                                    className="cursor-pointer"
-                                                />
-                                            </td>
-                                        )}
-                                        <td className="px-6 py-2 md:py-4 text-sm font-medium text-gray-900">
+                                        <td className="px-6 py-4 text-center" onClick={(e) => e.stopPropagation()}>
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedIds.includes(meeting.id)}
+                                                onChange={() => toggleSelect(meeting.id)}
+                                                className="cursor-pointer w-4 h-4"
+                                            />
+                                        </td>
+                                        <td
+                                            className="px-6 py-2 md:py-4 text-sm font-medium text-gray-900 cursor-pointer"
+                                            onClick={() => router.push(`/details/${meeting.id}`)}
+                                        >
                                             {meeting.meeting_name}
                                         </td>
-                                        <td className="px-6 py-2 md:py-4 text-sm text-gray-600 capitalize">
+                                        <td
+                                            className="px-6 py-2 md:py-4 text-sm text-gray-600 capitalize cursor-pointer"
+                                            onClick={() => router.push(`/details/${meeting.id}`)}
+                                        >
                                             {meeting.file_type}
                                         </td>
-                                        <td className="px-6 py-2 md:py-4 text-sm text-gray-600">
+                                        <td
+                                            className="px-6 py-2 md:py-4 text-sm text-gray-600 cursor-pointer"
+                                            onClick={() => router.push(`/details/${meeting.id}`)}
+                                        >
                                             {formatFileSize(meeting.file_size)}
                                         </td>
-                                        <td className="px-6 py-2 md:py-4 text-sm">
+                                        <td
+                                            className="px-6 py-2 md:py-4 text-sm cursor-pointer"
+                                            onClick={() => router.push(`/details/${meeting.id}`)}
+                                        >
                                             <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(meeting.status)}`}>
                                                 {meeting.status?.charAt(0).toUpperCase() + meeting.status?.slice(1)}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-2 md:py-4 text-sm text-gray-600">
+                                        <td
+                                            className="px-6 py-2 md:py-4 text-sm text-gray-600 cursor-pointer"
+                                            onClick={() => router.push(`/details/${meeting.id}`)}
+                                        >
                                             {formatDate(meeting.created_at)}
                                         </td>
                                         <td className="px-6 py-2 md:py-4 text-sm space-x-2 flex" onClick={(e) => e.stopPropagation()}>
@@ -309,14 +318,14 @@ const MeetingHistory = () => {
             <div className="mt-8 sm:w-[100%] w-[88%] mx-auto flex gap-2 md:gap-4 justify-center pb-8">
                 <button
                     onClick={() => router.push('/dashboard')}
-                    className="md:px-6 px-4 py-3 md:py-3 bg-white text-sm cursor-pointer shadow-lg md:text-lg text-gray-800 font-semibold rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2"
+                    className="md:px-6 px-4 py-3 md:py-3 bg-white text-sm cursor-pointer shadow-xl md:text-lg text-gray-800 font-semibold rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2"
                 >
                     ← Back to Dashboard
                 </button>
 
                 <button
                     onClick={() => router.push('/upload')}
-                    className="md:px-6 px-4 py-3 md:py-3 text-sm cursor-pointer shadow-lg bg-teal-600 md:text-lg text-white font-semibold rounded-lg hover:bg-teal-700 transition-colors duration-200 flex items-center gap-2"
+                    className="md:px-6 px-4 py-3 md:py-3 text-sm cursor-pointer shadow-xl bg-teal-600 md:text-lg text-white font-semibold rounded-lg hover:bg-teal-700 transition-colors duration-200 flex items-center gap-2"
                 >
                     Upload File
                 </button>
