@@ -146,6 +146,15 @@ Respond with this exact JSON structure:
   ]
 }
 
+CRITICAL INSTRUCTIONS FOR PARTICIPANTS:
+- Extract ACTUAL NAMES mentioned in the transcript (e.g., "John Smith", "Sarah Johnson", "Dr. Michael Chen")
+- Look for introductions, name mentions, or any references to people by name
+- If someone says "Hi, I'm [Name]" or "This is [Name] speaking", capture that name
+- If no actual names are mentioned, look for any identifiers used (e.g., "John from Marketing", "Sarah the Project Manager")
+- DO NOT use generic roles like "Meeting Leader" or "Mentor" - always try to find the actual names first
+- Include email addresses if mentioned in the transcript
+- If absolutely no names can be found, only then use descriptive identifiers from context
+
 IMPORTANT: Return ONLY the JSON object. No markdown code blocks, no extra text, no explanations. Start with { and end with }.`
 
   console.log(`[GROQ-ANALYSIS] Sending request to Groq API...`)
