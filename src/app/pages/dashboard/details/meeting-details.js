@@ -142,15 +142,43 @@ const MeetingDetailsPage = ({ meetingId }) => {
         setInputValue('');
         setIsTyping(true);
 
-        const prompt = `You are an expert meeting assistant. Answer questions using only the provided meeting context. If information is missing, say so and suggest next steps. Be concise and actionable.\n\n` +
-            `Meeting Metadata: Title: ${data.title || 'Untitled'}; Date: ${data.created_at || ''}; Status: ${data.status || ''}; File: ${data.file_name || ''} (${data.file_type || ''}, ${data.file_size || ''}).\n` +
-            `Participants: ${(Array.isArray(data.participants) && data.participants.length > 0) ? data.participants.map(p => `${p.name}${p.email ? ' — ' + p.email : ''}`).join('; ') : 'No participants recorded.'}\n` +
-            `Summary: """${data.summary || ''}"""\n` +
-            `Key Points: ${JSON.stringify(Array.isArray(data.key_points) ? data.key_points : [])}\n` +
-            `Action Items: ${JSON.stringify(Array.isArray(data.action_items) ? data.action_items : [])}\n` +
-            `Transcript (full): """${data.transcript || ''}"""\n\n` +
-            `User Question: """${question}"""\n\n` +
-            `Instructions: Ground answers in transcript and summary. Use bullets. Bold labels like Decision:. Keep under 8–12 lines unless asked. Do not invent facts.`
+        // Build context from meeting data
+        const meetingContext = {
+            title: data.title || 'Untitled Meeting',
+            date: data.created_at ? formatDate(data.created_at) : 'Unknown date',
+            status: data.status || 'Unknown',
+            participants: (Array.isArray(data.participants) && data.participants.length > 0)
+                ? data.participants.map(p => p.name).join(', ')
+                : 'No participants recorded',
+            summary: data.summary || 'No summary available',
+            transcript: data.transcript || 'No transcript available',
+            keyTopics: Array.isArray(data.key_topics) ? data.key_topics : [],
+            actionItems: Array.isArray(data.action_items) ? data.action_items : [],
+        };
+
+        const prompt = `You are a helpful AI assistant analyzing this meeting. Answer the user's question directly and concisely.
+
+Meeting Context:
+Title: ${meetingContext.title}
+Date: ${meetingContext.date}
+Participants: ${meetingContext.participants}
+
+Summary: ${meetingContext.summary}
+
+${meetingContext.keyTopics.length > 0 ? `Key Topics: ${meetingContext.keyTopics.join(', ')}` : ''}
+
+${meetingContext.actionItems.length > 0 ? `Action Items: ${meetingContext.actionItems.join('; ')}` : ''}
+
+Transcript: ${meetingContext.transcript}
+
+Question: ${question}
+
+Instructions:
+- Answer ONLY what is asked - stay focused on the specific question
+- Keep response short (2-4 sentences typically)
+- Use natural, conversational language
+- If the answer isn't in the meeting, say "I don't see that information in this meeting"
+- Only expand if the user asks for more details or explanation`;
 
         const groqApiKey = process.env.NEXT_PUBLIC_GROQ_API_KEY
 
@@ -173,12 +201,17 @@ const MeetingDetailsPage = ({ meetingId }) => {
                     model: 'llama-3.3-70b-versatile',
                     messages: [
                         {
+                            role: 'system',
+                            content: 'You are a concise meeting assistant. Answer questions directly in 2-4 sentences. Only provide what is asked. Be natural but brief.',
+                        },
+                        {
                             role: 'user',
                             content: prompt,
                         },
                     ],
-                    temperature: 0.3,
-                    max_tokens: 1024,
+                    temperature: 0.5,
+                    max_tokens: 512,
+                    top_p: 1,
                 }),
             })
 

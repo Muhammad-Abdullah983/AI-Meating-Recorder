@@ -167,14 +167,27 @@ export default function Navbar() {
                 </button>
 
                 {showDropdown && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
-                    <div className="px-4 py-3 border-b border-gray-300">
-                      <p className="text-sm font-medium text-gray-700">{userName}</p>
-                      <p className="text-xs text-gray-500 truncate">{userEmail}</p>
+                  <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
+                    <div className="flex items-center gap-3 px-4 py-4 border-b border-gray-300">
+                      <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center text-white font-bold overflow-hidden flex-shrink-0">
+                        {profilePicture ? (
+                          <img
+                            src={profilePicture}
+                            alt={userName}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span>{userInitial}</span>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-700 ">{userName}</p>
+                        <p className="text-xs text-gray-500 truncate">{userEmail}</p>
+                      </div>
                     </div>
                     <Link
                       href="/profile"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="block px-4 py-3 text-base text-gray-700 hover:bg-gray-100"
                       onClick={() => setShowDropdown(false)}
                     >
                       My Profile
@@ -184,7 +197,7 @@ export default function Navbar() {
                         setShowDropdown(false);
                         handleLogout();
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 border-t border-gray-300"
+                      className="w-full text-left px-4 py-3 text-base cursor-pointer text-red-600 hover:bg-gray-100 border-t border-gray-300"
                     >
                       Logout
                     </button>
