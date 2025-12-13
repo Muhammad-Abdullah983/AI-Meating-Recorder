@@ -2,7 +2,7 @@
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState, useRef } from 'react'
-import { Edit, Users } from 'lucide-react'
+import { Edit, Users, CheckCircle } from 'lucide-react'
 import { FaSpinner } from "react-icons/fa6";
 
 const MeetingDetailsPage = ({ meetingId }) => {
@@ -298,7 +298,7 @@ Instructions:
                                     </button>
                                     <button
                                         onClick={cancelEditName}
-                                        className="px-4 py-2 bg-gray-200 cursor-poin text-gray-800 rounded-md text-sm font-medium hover:bg-gray-300 whitespace-nowrap"
+                                        className="px-4 py-2 bg-gray-200 cursor-pointer text-gray-800 rounded-md text-sm font-medium hover:bg-gray-300 whitespace-nowrap"
                                     >
                                         Cancel
                                     </button>
@@ -406,7 +406,7 @@ Instructions:
                                     <h3 className="text-lg font-bold text-gray-900">📌 Key Points</h3>
                                     <ul className="flex flex-col gap-3">
                                         {data.key_points.map((point, index) => (
-                                            <li key={index} className="flex gap-3 p-3 bg-teal-50 rounded-lg ">
+                                            <li key={index} className="flex gap-3 p-3  rounded-lg ">
                                                 <span className="flex items-center justify-center w-6 h-6 bg-blue-500 text-white rounded-full text-xs font-bold shrink-0">
                                                     {index + 1}
                                                 </span>
@@ -423,8 +423,8 @@ Instructions:
                                     <h3 className="text-lg font-bold text-gray-900">✓ Action Items</h3>
                                     <ul className="flex flex-col gap-3">
                                         {data.action_items.map((item, index) => (
-                                            <li key={index} className="flex gap-3 p-3 bg-yellow-50 rounded-lg">
-
+                                            <li key={index} className="flex gap-3 p-3  rounded-lg">
+                                                <CheckCircle className="w-5 h-5 text-green-600 shrink-0" />
                                                 <span className="text-sm leading-relaxed text-gray-900">{item}</span>
                                             </li>
                                         ))}

@@ -18,10 +18,9 @@ export default function Navbar() {
   const dispatch = useDispatch();
   const { user, isAuthenticated } = useSelector((state) => state.auth);
 
-  // Hide navbar on auth pages (login, signup, verify)
+
   const isAuthPage = pathname?.startsWith('/auth/');
 
-  // Fetch user profile picture
   useEffect(() => {
     async function fetchProfilePicture() {
       if (user?.id) {

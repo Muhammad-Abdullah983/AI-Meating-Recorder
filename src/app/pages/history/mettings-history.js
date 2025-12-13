@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { FileText, Trash2, Eye, Loader } from 'lucide-react'
 import { supabase } from '@/lib/supabaseClient'
 import toast from 'react-hot-toast'
+import { FaSpinner } from "react-icons/fa6";
+
 
 
 const MeetingHistory = () => {
@@ -167,7 +169,8 @@ const MeetingHistory = () => {
 
                 {isLoading ? (
                     <div className="flex justify-center items-center py-12">
-                        <Loader className="w-8 h-8 animate-spin text-indigo-600" />
+                        <FaSpinner className='w-8 h-8 animate-spin text-teal-600' />
+
                     </div>
                 ) : meetings.length === 0 ? (
                     <div className="bg-white rounded-lg shadow p-8 text-center">
