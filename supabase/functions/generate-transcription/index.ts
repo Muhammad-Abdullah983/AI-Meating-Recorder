@@ -242,9 +242,7 @@ IMPORTANT: Return ONLY the JSON object. No markdown code blocks, no extra text, 
   }
 }
 
-/**
- * Update meeting record in database with transcription and analysis
- */
+
 async function updateMeetingRecord(
   meetingId: string,
   transcription: string,
@@ -281,9 +279,6 @@ async function updateMeetingRecord(
 }
 
 
-/**
- * Main request handler
- */
 Deno.serve(async (req: Request): Promise<Response> => {
   console.log(`\n${'='.repeat(80)}`)
   console.log(`[REQUEST] New edge function invocation at ${new Date().toISOString()}`)

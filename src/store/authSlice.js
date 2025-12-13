@@ -163,7 +163,9 @@ const authSlice = createSlice({
             state.error = null;
         },
         setUser(state, action) {
-            state.user = action.payload;
+            state.user = action.payload.user;
+            state.session = action.payload.session;
+            state.token = action.payload.session?.access_token;
             state.isAuthenticated = true;
         },
         setToken(state, action) {

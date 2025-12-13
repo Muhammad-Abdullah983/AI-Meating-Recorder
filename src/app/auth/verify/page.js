@@ -1,5 +1,4 @@
 import VerifyForm from '@/components/auth/verify/page'
-import AuthWrapper from '@/components/auth/authWrapper'
 import React, { Suspense } from 'react'
 
 const VerifyPage = () => {

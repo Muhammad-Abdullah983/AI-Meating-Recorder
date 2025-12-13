@@ -40,7 +40,7 @@ export default function LoginForm() {
 
       if (result) {
         toast.success("Login successful!");
-        router.push("/");
+        router.push("/dashboard");
       }
     } catch (err) {
       // Error is already handled in Redux state
