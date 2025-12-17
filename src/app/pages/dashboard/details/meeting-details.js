@@ -15,6 +15,7 @@ const MeetingDetailsPage = ({ meetingId }) => {
     const [isEditingName, setIsEditingName] = useState(false);
     const [tempName, setTempName] = useState('');
     const messagesEndRef = useRef(null);
+    const messagesContainerRef = useRef(null);
     const router = useRouter();
 
     const fetchMeetingDetails = async (meetingId) => {
@@ -47,9 +48,11 @@ const MeetingDetailsPage = ({ meetingId }) => {
         }
     }, [meetingId]);
 
-    // Auto-scroll to latest message
+    // Auto-scroll to latest message within the chat container
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
+        if (messagesContainerRef.current) {
+            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+        }
     }, [messages, isTyping]);
 
     if (loading) {
@@ -474,7 +477,7 @@ Instructions:
                     {activeTab === 'qaTab' && (
                         <div className="flex flex-col gap-4 h-[600px]">
                             {/* Chat Messages Container */}
-                            <div className="flex-1 overflow-y-auto  rounded-lg p-4 space-y-4">
+                            <div ref={messagesContainerRef} className="flex-1 overflow-y-auto rounded-lg p-4 space-y-4">
                                 {messages.length === 0 ? (
                                     <div className="flex items-center justify-center h-full">
                                         <div className="text-center flex flex-col gap-3">

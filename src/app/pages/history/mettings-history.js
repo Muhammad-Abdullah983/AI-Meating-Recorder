@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
+import { useSelector } from 'react-redux'
 import { useRouter } from 'next/navigation'
 import { FileText, Trash2, Eye, Loader } from 'lucide-react'
 import { supabase } from '@/lib/supabaseClient'
@@ -13,37 +14,88 @@ const MeetingHistory = () => {
     const router = useRouter()
     const [meetings, setMeetings] = useState([])
     const [isLoading, setIsLoading] = useState(true)
+    const [isLoadingMore, setIsLoadingMore] = useState(false)
     const [deleteConfirm, setDeleteConfirm] = useState(null)
     const [selectedIds, setSelectedIds] = useState([])
+    const [hasMore, setHasMore] = useState(true)
+    const [totalCount, setTotalCount] = useState(0)
+    const observerTarget = useRef(null)
+    const hasFetched = useRef(false)
+    const user = useSelector(state => state.auth.user)
+    const LIMIT = 10
 
     useEffect(() => {
-        fetchMeetings()
-    }, [])
+        if (hasFetched.current || !user) return
+        hasFetched.current = true
 
-    const fetchMeetings = async () => {
+        setMeetings([])
+        setHasMore(true)
+        fetchMeetings(0)
+    }, [user])
+
+    // Set up intersection observer for infinite scroll
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            entries => {
+                if (entries[0].isIntersecting && hasMore && !isLoadingMore && !isLoading) {
+                    loadMore()
+                }
+            },
+            { threshold: 0.1 }
+        )
+
+        if (observerTarget.current) {
+            observer.observe(observerTarget.current)
+        }
+
+        return () => observer.disconnect()
+    }, [hasMore, isLoadingMore, isLoading])
+
+    const fetchMeetings = async (offset) => {
         try {
-            setIsLoading(true)
+            if (offset === 0) setIsLoading(true)
+            else setIsLoadingMore(true)
 
-            // Get user session
-            const { data: { user } } = await supabase.auth.getUser()
-            if (!user) return
+            if (!user) {
+                setIsLoading(false)
+                return
+            }
 
-            // Fetch all meetings for this user
-            const { data: meetingsData, error } = await supabase
+            // Fetch meetings with pagination
+            const { data: meetingsData, error, count } = await supabase
                 .from('meetings')
-                .select('*')
+                .select('*', { count: 'exact' })
                 .eq('user_id', user.id)
                 .order('created_at', { ascending: false })
+                .range(offset, offset + LIMIT - 1)
 
             if (error) throw error
 
-            setMeetings(meetingsData || [])
+            setTotalCount(count || 0)
+
+            // Append or replace meetings based on offset
+            if (offset === 0) {
+                setMeetings(meetingsData || [])
+            } else {
+                setMeetings(prev => [...prev, ...(meetingsData || [])])
+            }
+
+            // Check if there are more meetings to load
+            const loadedTotal = offset + LIMIT
+            setHasMore(loadedTotal < (count || 0))
         } catch (error) {
             console.error('Error fetching meetings:', error)
             toast.error('Failed to load meetings. Please try again.')
         } finally {
             setIsLoading(false)
+            setIsLoadingMore(false)
         }
+    }
+
+    const loadMore = () => {
+        if (isLoadingMore || !hasMore) return
+        const newOffset = meetings.length
+        fetchMeetings(newOffset)
     }
 
     const formatDate = (dateString) => {
@@ -96,10 +148,7 @@ const MeetingHistory = () => {
 
     const handleDeleteSelected = async () => {
         try {
-            const { data: { user } } = await supabase.auth.getUser()
-            if (!user) return
-
-            if (selectedIds.length === 0) return
+            if (!user || selectedIds.length === 0) return
 
             const { error } = await supabase
                 .from('meetings')
@@ -167,7 +216,7 @@ const MeetingHistory = () => {
                     )}
                 </div>
 
-                {isLoading ? (
+                {isLoading && meetings.length === 0 ? (
                     <div className="flex justify-center items-center py-12">
                         <FaSpinner className='w-8 h-8 animate-spin text-teal-600' />
 
@@ -179,7 +228,7 @@ const MeetingHistory = () => {
                         <p className="text-gray-500 text-sm">Upload your first meeting to get started</p>
                     </div>
                 ) : (
-                    <div className="bg-white rounded-lg shadow overflow-x-auto  overflow-y-auto">
+                    <div className="bg-white rounded-lg shadow overflow-x-auto max-h-[400px] overflow-y-auto">
                         <table className="w-full">
                             <thead className="bg-gray-200 border-b border-gray-200">
                                 <tr>
@@ -278,6 +327,19 @@ const MeetingHistory = () => {
                                 ))}
                             </tbody>
                         </table>
+                    </div>
+                )}
+                {/* Intersection Observer Target - Triggers loading more */}
+                {hasMore && (
+                    <div
+                        ref={observerTarget}
+                        className="w-full py-8 flex justify-center items-center"
+                    >
+                        {isLoadingMore && (
+                            <div className="text-center">
+                                <FaSpinner className='w-8 h-8 animate-spin text-teal-600' />
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

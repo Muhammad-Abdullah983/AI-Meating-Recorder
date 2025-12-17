@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState, useRef } from 'react'
+import { useSelector } from 'react-redux'
 import { FileText, Calendar, CheckCircle, Clock } from 'lucide-react'
 import { supabase } from '@/lib/supabaseClient'
 
@@ -70,98 +71,88 @@ const DashboardMetrics = () => {
   })
   const [isLoading, setIsLoading] = useState(true)
   const hasFetched = useRef(false)
+  const user = useSelector(state => state.auth.user)
 
   useEffect(() => {
-    if (hasFetched.current) return
+    if (hasFetched.current || !user) return
     hasFetched.current = true
     fetchMetrics()
-  }, [])
+  }, [user])
 
   const fetchMetrics = async () => {
     try {
       setIsLoading(true)
 
-      // Get user session
-      const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      // Fetch all meetings for this user
-      const { data: allMeetings, error: allError } = await supabase
+      // Single API call: Fetch all meetings for this user
+      const { data: allMeetings, error } = await supabase
         .from('meetings')
         .select('id, status, created_at, transcript')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
-      if (allError) throw allError
+      if (error) throw error
 
-      // Fetch this week's meetings
+      // Calculate all date ranges
       const today = new Date()
-      const weekStart = new Date(today.setDate(today.getDate() - today.getDay()))
+      const weekStart = new Date(today)
+      weekStart.setDate(weekStart.getDate() - weekStart.getDay())
       weekStart.setHours(0, 0, 0, 0)
 
-      const { data: weekMeetings, error: weekError } = await supabase
-        .from('meetings')
-        .select('id, status, created_at')
-        .eq('user_id', user.id)
-        .gte('created_at', weekStart.toISOString())
-
-      if (weekError) throw weekError
-
-      // Compute today's range
       const todayStart = new Date()
       todayStart.setHours(0, 0, 0, 0)
       const todayEnd = new Date()
       todayEnd.setHours(23, 59, 59, 999)
 
-      // Count meetings by status
-      const completedMeetings = allMeetings.filter(m => m.status === 'completed')
-      const withTranscriptsMeetings = allMeetings.filter(m => m.transcript && m.transcript.length > 0)
-      const todayMeetings = allMeetings.filter(m => {
-        const d = new Date(m.created_at)
-        return d >= todayStart && d <= todayEnd
-      })
-
-      // Calculate completion rate percentage
-      const completedRate = allMeetings.length > 0
-        ? Math.round((completedMeetings.length / allMeetings.length) * 100)
-        : 0
-
-      // Calculate week-over-week change (comparing to previous week)
       const prevWeekStart = new Date(weekStart)
       prevWeekStart.setDate(prevWeekStart.getDate() - 7)
 
-      const { data: prevWeekMeetings } = await supabase
-        .from('meetings')
-        .select('id, created_at')
-        .eq('user_id', user.id)
-        .gte('created_at', prevWeekStart.toISOString())
-        .lt('created_at', weekStart.toISOString())
-
-      // Calculate week-over-week change
-      let weekChange = 0
-      if (prevWeekMeetings && prevWeekMeetings.length > 0) {
-        weekChange = Math.round(((weekMeetings.length - prevWeekMeetings.length) / prevWeekMeetings.length) * 100)
-      } else if (weekMeetings.length > 0) {
-        // If no previous week data but we have meetings this week, show 100% growth
-        weekChange = 100
-      }
-
-      // Calculate today's change (comparing to yesterday or showing growth if first day)
       const yesterdayStart = new Date(todayStart)
       yesterdayStart.setDate(yesterdayStart.getDate() - 1)
       const yesterdayEnd = new Date(todayStart)
       yesterdayEnd.setMilliseconds(-1)
+
+      // Filter data client-side
+      const completedMeetings = allMeetings.filter(m => m.status === 'completed')
+      const withTranscriptsMeetings = allMeetings.filter(m => m.transcript && m.transcript.length > 0)
+
+      const weekMeetings = allMeetings.filter(m => {
+        const d = new Date(m.created_at)
+        return d >= weekStart
+      })
+
+      const prevWeekMeetings = allMeetings.filter(m => {
+        const d = new Date(m.created_at)
+        return d >= prevWeekStart && d < weekStart
+      })
+
+      const todayMeetings = allMeetings.filter(m => {
+        const d = new Date(m.created_at)
+        return d >= todayStart && d <= todayEnd
+      })
 
       const yesterdayMeetings = allMeetings.filter(m => {
         const d = new Date(m.created_at)
         return d >= yesterdayStart && d <= yesterdayEnd
       })
 
+      // Calculate percentages and changes
+      const completedRate = allMeetings.length > 0
+        ? Math.round((completedMeetings.length / allMeetings.length) * 100)
+        : 0
+
+      let weekChange = 0
+      if (prevWeekMeetings.length > 0) {
+        weekChange = Math.round(((weekMeetings.length - prevWeekMeetings.length) / prevWeekMeetings.length) * 100)
+      } else if (weekMeetings.length > 0) {
+        weekChange = 100
+      }
+
       let todayChange = 0
       if (yesterdayMeetings.length > 0) {
         todayChange = Math.round(((todayMeetings.length - yesterdayMeetings.length) / yesterdayMeetings.length) * 100)
       } else if (todayMeetings.length > 0) {
-        // If no meetings yesterday but we have meetings today, show 100% growth
         todayChange = 100
       }
 

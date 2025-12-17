@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
+import { useSelector } from 'react-redux'
 import { useRouter } from 'next/navigation'
 import { CheckCircle2, AlertCircle, Loader, FileVideo, Calendar, Users } from 'lucide-react'
 import { supabase } from '@/lib/supabaseClient'
@@ -11,35 +12,87 @@ const MeetingCards = ({ searchQuery = '' }) => {
     const router = useRouter()
     const [meetings, setMeetings] = useState([])
     const [isLoading, setIsLoading] = useState(true)
+    const [isLoadingMore, setIsLoadingMore] = useState(false)
     const [hoveredCard, setHoveredCard] = useState(null)
+    const [hasMore, setHasMore] = useState(true)
+    const [totalCount, setTotalCount] = useState(0)
+    const observerTarget = useRef(null)
+    const hasFetched = useRef(false)
+    const user = useSelector(state => state.auth.user)
+    const LIMIT = 10
 
+    // Initial fetch
     useEffect(() => {
-        fetchMeetings()
-    }, [])
+        if (hasFetched.current || !user) return
+        hasFetched.current = true
 
-    const fetchMeetings = async () => {
+        setMeetings([])
+        setHasMore(true)
+        fetchMeetings(0)
+    }, [user])
+
+    // Set up intersection observer for infinite scroll
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            entries => {
+                if (entries[0].isIntersecting && hasMore && !isLoadingMore && !isLoading) {
+                    loadMore()
+                }
+            },
+            { threshold: 0.1 }
+        )
+
+        if (observerTarget.current) {
+            observer.observe(observerTarget.current)
+        }
+
+        return () => observer.disconnect()
+    }, [hasMore, isLoadingMore, isLoading])
+
+    const fetchMeetings = async (offset) => {
         try {
-            setIsLoading(true)
+            if (offset === 0) setIsLoading(true)
+            else setIsLoadingMore(true)
 
-            // Get user session
-            const { data: { user } } = await supabase.auth.getUser()
-            if (!user) return
+            if (!user) {
+                setIsLoading(false)
+                return
+            }
 
-            // Fetch all meetings for this user
-            const { data: meetingsData, error } = await supabase
+            // Fetch meetings with pagination
+            const { data: meetingsData, error, count } = await supabase
                 .from('meetings')
-                .select('*')
+                .select('*', { count: 'exact' })
                 .eq('user_id', user.id)
                 .order('created_at', { ascending: false })
+                .range(offset, offset + LIMIT - 1)
 
             if (error) throw error
 
-            setMeetings(meetingsData || [])
+            setTotalCount(count || 0)
+
+            // Append or replace meetings based on offset
+            if (offset === 0) {
+                setMeetings(meetingsData || [])
+            } else {
+                setMeetings(prev => [...prev, ...(meetingsData || [])])
+            }
+
+            // Check if there are more meetings to load
+            const loadedTotal = offset + LIMIT
+            setHasMore(loadedTotal < (count || 0))
         } catch (error) {
             console.error('Error fetching meetings:', error)
         } finally {
             setIsLoading(false)
+            setIsLoadingMore(false)
         }
+    }
+
+    const loadMore = () => {
+        if (isLoadingMore || !hasMore) return
+        const newOffset = meetings.length
+        fetchMeetings(newOffset)
     }
 
     // Filter meetings based on search query
@@ -84,11 +137,11 @@ const MeetingCards = ({ searchQuery = '' }) => {
         }
     }
 
-    if (isLoading) {
+    if (isLoading && meetings.length === 0) {
         return (
             <div className="w-full py-12 flex justify-center items-center">
                 <div className="text-center">
-                    
+
                     <p className="text-gray-600 font-medium">
                         <FaSpinner className='w-8 h-8 animate-spin text-teal-600' />
 
@@ -208,6 +261,20 @@ const MeetingCards = ({ searchQuery = '' }) => {
                     </div>
                 ))}
             </div>
+
+            {/* Intersection Observer Target - Triggers loading more */}
+            {hasMore && (
+                <div
+                    ref={observerTarget}
+                    className="w-full py-8 flex justify-center items-center"
+                >
+                    {isLoadingMore && (
+                        <div className="text-center">
+                            <FaSpinner className='w-8 h-8 animate-spin text-teal-600' />
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     )
 }
