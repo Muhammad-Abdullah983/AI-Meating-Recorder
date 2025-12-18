@@ -47,6 +47,10 @@ export const signupUser = createAsyncThunk(
                 } catch (_) { }
             }
 
+
+
+
+
             return {
                 user: data.user,
                 session: data.session,
